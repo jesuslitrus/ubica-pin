@@ -244,7 +244,7 @@ const confirmDelete = (id) => {
 
 <TouchableOpacity
   style={styles.deleteButton}
-  onPress={() => confirmDelete(item.id)}
+  onPress={() => deleteLocation(item.id)}
 >
   <Text style={styles.buttonText}>Eliminar</Text>
 </TouchableOpacity>
