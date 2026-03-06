@@ -128,10 +128,9 @@ const addLocation = async () => {
 };
 
 
-
 const confirmDelete = (id) => {
 
-  console.log("confirmDelete ejecutado");
+  console.log("CONFIRM DELETE EJECUTADO", id);
 
   if (Platform.OS === "web") {
 
@@ -153,6 +152,7 @@ const confirmDelete = (id) => {
     );
 
   }
+
 };
 
 };
@@ -247,12 +247,30 @@ const confirmDelete = (id) => {
   <Text style={styles.buttonText}>Editar</Text>
 </TouchableOpacity>
 
+
 <TouchableOpacity
   style={styles.deleteButton}
-  onPress={() => confirmDelete(item.id)}
+  onPress={() => {
+    if (Platform.OS === "web") {
+      if (window.confirm("¿Seguro que quieres borrar esta ubicación?")) {
+        deleteLocation(item.id);
+      }
+    } else {
+      Alert.alert(
+        "Eliminar ubicación",
+        "¿Seguro que quieres borrar esta ubicación?",
+        [
+          { text: "Cancelar", style: "cancel" },
+          { text: "Eliminar", onPress: () => deleteLocation(item.id) }
+        ]
+      );
+    }
+  }}
 >
   <Text style={styles.buttonText}>Eliminar</Text>
 </TouchableOpacity>
+
+
 
           </View>
         )}
