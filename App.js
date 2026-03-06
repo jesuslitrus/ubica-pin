@@ -166,7 +166,7 @@ const confirmDelete = (id) => {
   return (
     <View style={styles.container}>
 
-      <Text style={styles.title}>📍 Ubica-Pin test</Text>
+      <Text style={styles.title}>📍 Ubica-Pin tes</Text>
 
       <TextInput
         style={styles.input}
