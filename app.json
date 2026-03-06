@@ -1,0 +1,42 @@
+{
+  "expo": {
+    "name": "ubica-pin",
+    "slug": "ubica-pin",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+
+    "ios": {
+      "supportsTablet": true
+    },
+
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      }
+    },
+
+    "web": {
+      "bundler": "metro",
+      "favicon": "./assets/favicon.png",
+      "name": "Ubica-Pin",
+      "shortName": "UbicaPin",
+      "backgroundColor": "#ffffff",
+      "themeColor": "#000000",
+      "display": "standalone"
+    }
+  }
+}
+
