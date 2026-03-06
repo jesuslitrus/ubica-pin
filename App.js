@@ -131,6 +131,8 @@ const addLocation = async () => {
 
 const confirmDelete = (id) => {
 
+  console.log("confirmDelete ejecutado");
+
   if (Platform.OS === "web") {
 
     const confirmed = window.confirm("¿Seguro que quieres borrar esta ubicación?");
@@ -145,21 +147,12 @@ const confirmDelete = (id) => {
       "Eliminar ubicación",
       "¿Seguro que quieres borrar esta ubicación?",
       [
-        {
-          text: "Cancelar",
-          style: "cancel"
-        },
-        {
-          text: "Eliminar",
-          onPress: () => {
-            deleteLocation(id);
-          }
-        }
+        { text: "Cancelar", style: "cancel" },
+        { text: "Eliminar", onPress: () => deleteLocation(id) }
       ]
     );
 
   }
-
 };
 
 };
