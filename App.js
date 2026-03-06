@@ -133,7 +133,9 @@ const confirmDelete = (id) => {
 
   if (Platform.OS === "web") {
 
-    if (window.confirm("¿Seguro que quieres borrar esta ubicación?")) {
+    const confirmed = window.confirm("¿Seguro que quieres borrar esta ubicación?");
+    
+    if (confirmed) {
       deleteLocation(id);
     }
 
@@ -143,12 +145,22 @@ const confirmDelete = (id) => {
       "Eliminar ubicación",
       "¿Seguro que quieres borrar esta ubicación?",
       [
-        { text: "Cancelar", style: "cancel" },
-        { text: "Eliminar", style: "destructive", onPress: () => deleteLocation(id) }
+        {
+          text: "Cancelar",
+          style: "cancel"
+        },
+        {
+          text: "Eliminar",
+          onPress: () => {
+            deleteLocation(id);
+          }
+        }
       ]
     );
 
   }
+
+};
 
 };
 
@@ -171,7 +183,7 @@ const confirmDelete = (id) => {
   return (
     <View style={styles.container}>
 
-      <Text style={styles.title}>📍 Ubica-Pin tester1</Text>
+      <Text style={styles.title}>📍 Ubica-Pin</Text>
 
       <TextInput
         style={styles.input}
@@ -244,7 +256,7 @@ const confirmDelete = (id) => {
 
 <TouchableOpacity
   style={styles.deleteButton}
-  onPress={() => deleteLocation(item.id)}
+  onPress={() => confirmDelete(item.id)}
 >
   <Text style={styles.buttonText}>Eliminar</Text>
 </TouchableOpacity>
