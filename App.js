@@ -130,21 +130,26 @@ const addLocation = async () => {
 
 
 const confirmDelete = (id) => {
-  Alert.alert(
-    "Eliminar ubicación",
-    "¿Seguro que quieres borrar esta ubicación?",
-    [
-      {
-        text: "Cancelar",
-        style: "cancel"
-      },
-      {
-        text: "Eliminar",
-        style: "destructive",
-        onPress: () => deleteLocation(id)
-      }
-    ]
-  );
+
+  if (Platform.OS === "web") {
+
+    if (window.confirm("¿Seguro que quieres borrar esta ubicación?")) {
+      deleteLocation(id);
+    }
+
+  } else {
+
+    Alert.alert(
+      "Eliminar ubicación",
+      "¿Seguro que quieres borrar esta ubicación?",
+      [
+        { text: "Cancelar", style: "cancel" },
+        { text: "Eliminar", style: "destructive", onPress: () => deleteLocation(id) }
+      ]
+    );
+
+  }
+
 };
 
 
