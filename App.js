@@ -323,7 +323,7 @@ map: {
 
   deleteButton: {
     marginTop: 8,
-    backgroundColor: "#dc3544",
+    backgroundColor: "#dc3545",
     padding: 10,
     borderRadius: 6,
     alignItems: "center"
