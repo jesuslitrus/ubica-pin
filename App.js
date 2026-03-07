@@ -4,6 +4,8 @@ import * as Location from 'expo-location';
 
 import { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { db } from "./firebase";
+import { collection, addDoc, deleteDoc, doc, onSnapshot } from "firebase/firestore";
 let MapView = null;
 let Marker = null;
 
@@ -18,18 +20,32 @@ export default function App() {
   const [locations, setLocations] = useState([]);
   const [description, setDescription] = useState("");
   const [editingId, setEditingId] = useState(null);
+ 
   const [showMap, setShowMap] = useState(false);
 
 
-  useEffect(() => {
-    loadLocations();
-  }, []);
+useEffect(() => {
+
+  const unsubscribe = onSnapshot(collection(db, "locations"), (snapshot) => {
+
+    const data = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+
+    setLocations(data);
+
+  });
+
+  return unsubscribe;
+
+}, []);
+
 
 const openMaps = (lat, lng) => {
-    // Usamos el formato universal de Google Maps
-    const url = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
-    Linking.openURL(url);
-  };
+  const url = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+  Linking.openURL(url);
+};
 
 
 const addLocation = async () => {
@@ -68,12 +84,11 @@ const addLocation = async () => {
   }
 
   const newLocation = {
-    id: Date.now().toString(),
-    description: description || "Ubicación",
-    latitude: coords.latitude,
-    longitude: coords.longitude,
-    date: new Date().toLocaleDateString()
-  };
+  description: description || "Ubicación",
+  latitude: coords.latitude,
+  longitude: coords.longitude,
+  date: new Date().toLocaleDateString()
+};
 
   let updatedLocations;
 
@@ -95,10 +110,7 @@ const addLocation = async () => {
 
   setLocations(updatedLocations);
 
-  await AsyncStorage.setItem(
-    "locations",
-    JSON.stringify(updatedLocations)
-  );
+  await addDoc(collection(db, "locations"), newLocation);
 
   setDescription("");
 };
@@ -109,17 +121,18 @@ const addLocation = async () => {
 
 
   const deleteLocation = async (id) => {
+    await deleteDoc(doc(db, "locations", id));
 
-    const filteredLocations = locations.filter(
-      (location) => location.id !== id
-    );
+   const filteredLocations = locations.filter(
+  (location) => location.id !== id
+);
 
-    setLocations(filteredLocations);
+setLocations(filteredLocations);
 
-    await AsyncStorage.setItem(
-      "locations",
-      JSON.stringify(filteredLocations)
-    );
+await AsyncStorage.setItem(
+  "locations",
+  JSON.stringify(filteredLocations)
+);
   };
 
 
@@ -162,17 +175,7 @@ const confirmDelete = (id) => {
 
 
 
-  const loadLocations = async () => {
-    try {
-      const savedLocations = await AsyncStorage.getItem("locations");
-
-      if (savedLocations !== null) {
-        setLocations(JSON.parse(savedLocations));
-      }
-    } catch (error) {
-      console.log("Error cargando ubicaciones", error);
-    }
-  };
+  
 
   return (
     <View style={styles.container}>
