@@ -231,47 +231,47 @@ const confirmDelete = (id) => {
           <View style={styles.card}>
             <Text style={styles.description}>{item.description}</Text>
            
-           
-            <Text style={styles.date}>📅 {item.date}</Text>
+          <Text style={styles.date}>📅 {item.date}</Text>
 
-            <TouchableOpacity
-  style={styles.button}
-  onPress={() => openMaps(item.latitude, item.longitude)}
->
-  <Text style={styles.buttonText}>Abrir en Maps</Text>
-</TouchableOpacity>
+<View style={styles.buttonRow}>
 
-<TouchableOpacity
-  style={styles.editButton}
-  onPress={() => editLocation(item)}
->
-  <Text style={styles.buttonText}>Editar</Text>
-</TouchableOpacity>
+  <TouchableOpacity
+    style={styles.smallButton}
+    onPress={() => openMaps(item.latitude, item.longitude)}
+  >
+    <Text style={styles.buttonText}>Maps</Text>
+  </TouchableOpacity>
 
+  <TouchableOpacity
+    style={styles.smallEditButton}
+    onPress={() => editLocation(item)}
+  >
+    <Text style={styles.buttonText}>Editar</Text>
+  </TouchableOpacity>
 
-<TouchableOpacity
-  style={styles.deleteButton}
-  onPress={() => {
-    if (Platform.OS === "web") {
-      if (window.confirm("¿Seguro que quieres borrar esta ubicación?")) {
-        deleteLocation(item.id);
+  <TouchableOpacity
+    style={styles.smallDeleteButton}
+    onPress={() => {
+      if (Platform.OS === "web") {
+        if (window.confirm("¿Seguro que quieres borrar esta ubicación?")) {
+          deleteLocation(item.id);
+        }
+      } else {
+        Alert.alert(
+          "Eliminar ubicación",
+          "¿Seguro que quieres borrar esta ubicación?",
+          [
+            { text: "Cancelar", style: "cancel" },
+            { text: "Eliminar", onPress: () => deleteLocation(item.id) }
+          ]
+        );
       }
-    } else {
-      Alert.alert(
-        "Eliminar ubicación",
-        "¿Seguro que quieres borrar esta ubicación?",
-        [
-          { text: "Cancelar", style: "cancel" },
-          { text: "Eliminar", onPress: () => deleteLocation(item.id) }
-        ]
-      );
-    }
-  }}
->
-  <Text style={styles.buttonText}>Eliminar</Text>
-</TouchableOpacity>
+    }}
+  >
+    <Text style={styles.buttonText}>Borrar</Text>
+  </TouchableOpacity>
 
-
+</View>
 
           </View>
         )}
@@ -377,6 +377,39 @@ map: {
   padding: 10,
   borderRadius: 6,
   alignItems: "center"
+},
+
+buttonRow: {
+  flexDirection: "row",
+  justifyContent: "space-between",
+  marginTop: 10
+},
+
+smallButton: {
+  flex: 1,
+  backgroundColor: "#007AFF",
+  paddingVertical: 8,
+  borderRadius: 20,
+  alignItems: "center",
+  marginRight: 5
+},
+
+smallEditButton: {
+  flex: 1,
+  backgroundColor: "#ffc107",
+  paddingVertical: 8,
+  borderRadius: 20,
+  alignItems: "center",
+  marginHorizontal: 5
+},
+
+smallDeleteButton: {
+  flex: 1,
+  backgroundColor: "#dc3545",
+  paddingVertical: 8,
+  borderRadius: 20,
+  alignItems: "center",
+  marginLeft: 5
 },
 
 });
