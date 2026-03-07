@@ -28,15 +28,22 @@
       }
     },
 
-    "web": {
-      "bundler": "metro",
-      "favicon": "./assets/favicon.png",
-      "name": "Ubica-Pin",
-      "shortName": "UbicaPin",
-      "backgroundColor": "#ffffff",
-      "themeColor": "#000000",
-      "display": "standalone"
-    }
-  }
+  "web": {
+  "bundler": "metro",
+  "output": "single",
+  "publicPath": "/ubica-pin/",
+  "useStaticRendering": false,
+  "favicon": "./assets/favicon.png",
+  "name": "Ubica-Pin",
+  "shortName": "UbicaPin",
+  "backgroundColor": "#ffffff",
+  "themeColor": "#000000",
+  "display": "standalone"
 }
+  }
+  
+}
+
+
+
 
