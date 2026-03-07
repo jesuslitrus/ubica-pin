@@ -6,7 +6,9 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+"deploy": "npx expo export --platform web && rm -rf docs && mv dist docs && touch docs/.nojekyll"
+    
   },
   "dependencies": {
     "@expo/ngrok": "^4.1.3",

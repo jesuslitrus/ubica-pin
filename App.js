@@ -25,7 +25,8 @@ export default function App() {
     loadLocations();
   }, []);
 
-  const openMaps = (lat, lng) => {
+const openMaps = (lat, lng) => {
+    // Usamos el formato universal de Google Maps
     const url = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
     Linking.openURL(url);
   };
