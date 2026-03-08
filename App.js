@@ -5,7 +5,7 @@ import * as Location from 'expo-location';
 import { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { db } from "./firebase";
-import { collection, addDoc, deleteDoc, doc, onSnapshot } from "firebase/firestore";
+import { collection, addDoc, deleteDoc, updateDoc, doc, onSnapshot } from "firebase/firestore";
 let MapView = null;
 let Marker = null;
 
@@ -91,27 +91,24 @@ const addLocation = async () => {
 };
 
   let updatedLocations;
-
+//
   if (editingId) {
 
-    updatedLocations = locations.map((loc) =>
-      loc.id === editingId
-        ? { ...loc, description }
-        : loc
-    );
+  const ref = doc(db, "locations", editingId);
 
-    setEditingId(null);
+  await updateDoc(ref, {
+    description: description
+  });
 
-  } else {
+  setEditingId(null);
 
-    updatedLocations = [newLocation, ...locations];
-
-  }
-
-  setLocations(updatedLocations);
+} else {
 
   await addDoc(collection(db, "locations"), newLocation);
 
+}
+
+setDescription("");
   setDescription("");
 };
 
