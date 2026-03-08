@@ -190,8 +190,10 @@ const confirmDelete = (id) => {
       />
 
       <TouchableOpacity style={styles.addButton} onPress={addLocation}>
-        <Text style={styles.addButtonText}>+ Nueva ubicación</Text>
-      </TouchableOpacity>
+  <Text style={styles.addButtonText}>
+    {editingId ? "Guardar cambios" : "+ Nueva ubicación"}
+  </Text>
+</TouchableOpacity>
 
       <TouchableOpacity
   style={styles.mapButton}
@@ -414,5 +416,9 @@ smallDeleteButton: {
   alignItems: "center",
   marginLeft: 5
 },
+
+addButton: {
+  backgroundColor: editingId ? "#ffc107" : "#28a745"
+}
 
 });
