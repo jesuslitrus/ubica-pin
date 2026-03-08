@@ -417,8 +417,7 @@ smallDeleteButton: {
   marginLeft: 5
 },
 
-addButton: {
-  backgroundColor: editingId ? "#ffc107" : "#28a745"
-}
+
+
 
 });
