@@ -186,7 +186,13 @@ const confirmDelete = (id) => {
         onChangeText={setDescription}
       />
 
-      <TouchableOpacity style={styles.addButton} onPress={addLocation}>
+     <TouchableOpacity
+  style={[
+    styles.addButton,
+    editingId && { backgroundColor: "#ffc107" }
+  ]}
+  onPress={addLocation}
+>
   <Text style={styles.addButtonText}>
     {editingId ? "Guardar cambios" : "+ Nueva ubicación"}
   </Text>
