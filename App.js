@@ -303,7 +303,7 @@ const styles = StyleSheet.create({
   },
 
   addButton: {
-    backgroundColor: "#28a745",
+    backgroundColor: editingId ? "#ffc107" : "#28a745",
     padding: 12,
     borderRadius: 8,
     alignItems: "center",
