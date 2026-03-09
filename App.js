@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, FlatList, TouchableOpacity, Linking, TextInput, Alert, Platform } from 'react-native';
+import { StyleSheet, Text, View, FlatList, TouchableOpacity, Linking, TextInput, Alert, Platform, Share } from 'react-native';
 import * as Location from 'expo-location';
 
 import { useState, useEffect } from 'react';
@@ -46,6 +46,23 @@ const openMaps = (lat, lng) => {
   const url = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
   Linking.openURL(url);
 };
+
+const shareLocation = async (location) => {
+
+  const url = `https://www.google.com/maps/search/?api=1&query=${location.latitude},${location.longitude}`;
+
+  try {
+
+    await Share.share({
+      message: `${location.description}\n📍 ${url}`
+    });
+
+  } catch (error) {
+    console.log(error);
+  }
+
+};
+
 
 
 const addLocation = async () => {
@@ -189,6 +206,9 @@ const confirmDelete = (id) => {
 
 <View style={styles.topButtonRow}>
 
+
+  
+
   <TouchableOpacity
     style={[
       styles.addButton,
@@ -263,6 +283,13 @@ const confirmDelete = (id) => {
   >
     <Text style={styles.buttonText}>✏️ Editar</Text>
   </TouchableOpacity>
+
+  <TouchableOpacity
+  style={styles.smallShareButton}
+  onPress={() => shareLocation(item)}
+>
+  <Text style={styles.buttonText}>📤 Compartir</Text>
+</TouchableOpacity>
 
   <TouchableOpacity
     style={styles.smallDeleteButton}
@@ -434,6 +461,20 @@ smallDeleteButton: {
   alignItems: "center",
   marginLeft: 5
 },
+
+
+
+smallShareButton: {
+  flex: 1,
+  backgroundColor: "#17a2b8",
+  paddingVertical: 8,
+  borderRadius: 20,
+  alignItems: "center",
+  marginHorizontal: 5
+},
+
+
+
 
 
 topButtonRow: {
