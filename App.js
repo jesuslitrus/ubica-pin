@@ -186,26 +186,33 @@ const confirmDelete = (id) => {
         onChangeText={setDescription}
       />
 
-     <TouchableOpacity
-  style={[
-    styles.addButton,
-    editingId && { backgroundColor: "#ffc107" }
-  ]}
-  onPress={addLocation}
->
-  <Text style={styles.addButtonText}>
-    {editingId ? "Guardar cambios" : "+ Nueva ubicación"}
-  </Text>
-</TouchableOpacity>
 
-      <TouchableOpacity
-  style={styles.mapButton}
-  onPress={() => setShowMap(!showMap)}
->
-  <Text style={styles.buttonText}>
-    {showMap ? "Ocultar mapa" : "Ver mapa"}
-  </Text>
-</TouchableOpacity>
+<View style={styles.topButtonRow}>
+
+  <TouchableOpacity
+    style={[
+      styles.addButton,
+      editingId && { backgroundColor: "#ffc107" }
+    ]}
+    onPress={addLocation}
+  >
+    <Text style={styles.addButtonText}>
+      {editingId ? "Guardar cambios" : "+ Nueva ubicación"}
+    </Text>
+  </TouchableOpacity>
+
+  <TouchableOpacity
+    style={styles.mapButton}
+    onPress={() => setShowMap(!showMap)}
+  >
+    <Text style={styles.buttonText}>
+      {showMap ? "Ocultar mapa" : "Ver mapa"}
+    </Text>
+  </TouchableOpacity>
+
+</View>
+
+
 
 {showMap && MapView && (
   <MapView
@@ -305,13 +312,14 @@ const styles = StyleSheet.create({
     marginBottom: 20
   },
 
-  addButton: {
-    backgroundColor: "#28a745",
-    padding: 12,
-    borderRadius: 8,
-    alignItems: "center",
-    marginBottom: 20
-  },
+ addButton: {
+  flex: 1,
+  backgroundColor: "#28a745",
+  padding: 12,
+  borderRadius: 8,
+  alignItems: "center",
+  marginRight: 5
+},
 
   addButtonText: {
     color: "white",
@@ -343,12 +351,13 @@ const styles = StyleSheet.create({
     alignItems: "center"
   },
 
-  mapButton: {
+mapButton: {
+  flex: 1,
   backgroundColor: "#6f42c1",
   padding: 12,
   borderRadius: 8,
   alignItems: "center",
-  marginBottom: 20
+  marginLeft: 5
 },
 
 map: {
@@ -421,6 +430,10 @@ smallDeleteButton: {
 },
 
 
-
+topButtonRow: {
+  flexDirection: "row",
+  justifyContent: "space-between",
+  marginBottom: 20
+},
 
 });
