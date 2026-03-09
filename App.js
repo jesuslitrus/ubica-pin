@@ -300,11 +300,11 @@ const confirmDelete = (id) => {
 const styles = StyleSheet.create({
 
   container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    paddingTop: 60,
-    paddingHorizontal: 20
-  },
+  flex: 1,
+  backgroundColor: "#d8dde3",
+  paddingTop: 60,
+  paddingHorizontal: 20
+},
 
   title: {
     fontSize: 32,
@@ -326,12 +326,17 @@ const styles = StyleSheet.create({
     fontWeight: "bold"
   },
 
-  card: {
-    backgroundColor: "#f2f2f2",
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 15
-  },
+ card: {
+  backgroundColor: "#ffffff",
+  padding: 16,
+  borderRadius: 14,
+  marginBottom: 14,
+  shadowColor: "#000",
+  shadowOpacity: 0.12,
+  shadowRadius: 6,
+  shadowOffset: { width: 0, height: 3 },
+  elevation: 3
+},
 
   description: {
     fontSize: 18,
@@ -381,12 +386,13 @@ map: {
   },
 
   input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    padding: 10,
-    marginBottom: 10
-  },
+  backgroundColor: "#ffffff",
+  borderWidth: 1,
+  borderColor: "#c9ced6",
+  borderRadius: 10,
+  padding: 12,
+  marginBottom: 12
+},
 
   editButton: {
   marginTop: 8,
