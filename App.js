@@ -274,21 +274,21 @@ const confirmDelete = (id) => {
     style={styles.smallButton}
     onPress={() => openMaps(item.latitude, item.longitude)}
   >
-    <Text style={styles.buttonText}>📍 Maps</Text>
+    <Text style={styles.buttonText}> Maps</Text>
   </TouchableOpacity>
 
   <TouchableOpacity
     style={styles.smallEditButton}
     onPress={() => editLocation(item)}
   >
-    <Text style={styles.buttonText}>✏️ Editar</Text>
+    <Text style={styles.buttonText}> Editar</Text>
   </TouchableOpacity>
 
   <TouchableOpacity
   style={styles.smallShareButton}
   onPress={() => shareLocation(item)}
 >
-  <Text style={styles.buttonText}>📤 Enviar</Text>
+  <Text style={styles.buttonText}> Enviar</Text>
 </TouchableOpacity>
 
   <TouchableOpacity
@@ -310,7 +310,7 @@ const confirmDelete = (id) => {
       }
     }}
   >
-    <Text style={styles.buttonText}>🗑 Borrar</Text>
+    <Text style={styles.buttonText}> Borrar</Text>
   </TouchableOpacity>
 
 </View>
