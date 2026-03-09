@@ -195,10 +195,7 @@ const confirmDelete = (id) => {
     <View style={styles.container}>
 
       <View style={styles.titleRow}>
-  <Image
-    source={require('./assets/logo_192.png')}
-    style={styles.titleLogo}
-  />
+ 
   <View style={styles.titleRow}>
   <Image
     source={require('./assets/logo_192.png')}
