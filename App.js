@@ -196,7 +196,7 @@ const confirmDelete = (id) => {
 
  <View style={styles.titleRow}>
   <Image
-    source={require('./assets/icon.png')}
+    source={require('/assets/logo_192.png')}
     style={styles.titleLogo}
   />
   <Text style={styles.title}>Ubica-Pin</Text>
