@@ -6,6 +6,8 @@ import { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { db } from "./firebase";
 import { collection, addDoc, deleteDoc, updateDoc, doc, onSnapshot } from "firebase/firestore";
+
+import logo from './assets/logo_192.png';
 let MapView = null;
 let Marker = null;
 
@@ -196,7 +198,7 @@ const confirmDelete = (id) => {
 
  <View style={styles.titleRow}>
   <Image
-    source={require('/assets/logo_192.png')}
+    source={logo}
     style={styles.titleLogo}
   />
   <Text style={styles.title}>Ubica-Pin</Text>
