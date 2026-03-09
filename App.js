@@ -288,7 +288,7 @@ const confirmDelete = (id) => {
   style={styles.smallShareButton}
   onPress={() => shareLocation(item)}
 >
-  <Text style={styles.buttonText}>📤 Compartir</Text>
+  <Text style={styles.buttonText}>📤 Enviar</Text>
 </TouchableOpacity>
 
   <TouchableOpacity
