@@ -489,18 +489,6 @@ topButtonRow: {
   marginBottom: 20
 },
 
-titleRow: {
-  flexDirection: "row",
-  alignItems: "center",
-  marginBottom: 20
-},
-
-titleLogo: {
-  width: 28,
-  height: 28,
-  marginRight: 8
-},
-
 
 
 
