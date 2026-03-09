@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, FlatList, TouchableOpacity, Linking, TextInput, Alert, Platform, Share } from 'react-native';
+import { StyleSheet, Text, View, FlatList, TouchableOpacity, Linking, TextInput, Alert, Platform, Share, Image } from 'react-native';
 import * as Location from 'expo-location';
 
 import { useState, useEffect } from 'react';
@@ -194,7 +194,13 @@ const confirmDelete = (id) => {
   return (
     <View style={styles.container}>
 
-      <Text style={styles.title}>📍 Ubica-Pin</Text>
+      <View style={styles.titleRow}>
+  <Image
+    source={require('./assets/logo_192.png')}
+    style={styles.titleLogo}
+  />
+  <Text style={styles.title}>Ubica-Pin</Text>
+</View>
 
       <TextInput
         style={styles.input}
@@ -482,5 +488,22 @@ topButtonRow: {
   justifyContent: "space-between",
   marginBottom: 20
 },
+
+
+titleRow: {
+  flexDirection: "row",
+  alignItems: "center",
+  marginBottom: 20
+},
+
+titleLogo: {
+  width: 28,
+  height: 28,
+  marginRight: 8
+},
+
+
+
+
 
 });
