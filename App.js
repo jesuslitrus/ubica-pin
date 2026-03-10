@@ -406,7 +406,7 @@ if (newMode === "local") {
   >
     <Text style={styles.modeText}>
   {appMode === "firebase"
-    ? "☁ Firebase"
+    ? "☁ Sync"
     : `💾 Local${localCount > 0 ? ` (${localCount})` : ""}`}
 </Text>
   </TouchableOpacity>
