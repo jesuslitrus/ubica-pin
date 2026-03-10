@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { db } from "./firebase";
 import { collection, addDoc, deleteDoc, updateDoc, doc, onSnapshot } from "firebase/firestore";
-const APP_MODE = "firebase";
+
 const LOCAL_STORAGE_KEY = "ubicapin_locations";
 
 let MapView = null;
@@ -77,6 +77,28 @@ const loadLocalLocations = async () => {
   if (stored) {
     setLocations(JSON.parse(stored));
   }
+
+};
+
+const syncLocalToFirebase = async () => {
+
+  const stored = await AsyncStorage.getItem(LOCAL_STORAGE_KEY);
+
+  if (!stored) return;
+
+  const localLocations = JSON.parse(stored);
+
+  if (localLocations.length === 0) return;
+
+  for (const loc of localLocations) {
+
+    const { id, ...data } = loc;
+
+    await addDoc(collection(db, "locations"), data);
+
+  }
+
+  await AsyncStorage.removeItem(LOCAL_STORAGE_KEY);
 
 };
 const shareLocation = async (location) => {
@@ -227,7 +249,7 @@ const confirmDelete = (id) => {
 };
 
 
-const toggleMode = () => {
+const toggleMode = async () => {
 
   const newMode = appMode === "firebase" ? "local" : "firebase";
 
@@ -238,7 +260,51 @@ const toggleMode = () => {
     );
 
     if (confirmed) {
-      setAppMode(newMode);
+      if (newMode === "firebase") {
+
+  const stored = await AsyncStorage.getItem(LOCAL_STORAGE_KEY);
+
+  if (stored) {
+
+    const localLocations = JSON.parse(stored);
+
+    if (localLocations.length > 0) {
+
+      if (Platform.OS === "web") {
+
+        const confirmed = window.confirm(
+          `Hay ${localLocations.length} ubicaciones locales. ¿Sincronizarlas con Firebase?`
+        );
+
+        if (confirmed) {
+          await syncLocalToFirebase();
+        }
+
+      } else {
+
+        Alert.alert(
+          "Sincronizar ubicaciones",
+          `Hay ${localLocations.length} ubicaciones locales. ¿Deseas sincronizarlas con Firebase?`,
+          [
+            { text: "Cancelar", style: "cancel" },
+            {
+              text: "Sincronizar",
+              onPress: async () => {
+                await syncLocalToFirebase();
+              }
+            }
+          ]
+        );
+
+      }
+
+    }
+
+  }
+
+}
+
+setAppMode(newMode);
 
 if (newMode === "local") {
   loadLocalLocations();
