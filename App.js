@@ -31,6 +31,8 @@ export default function App() {
 
 useEffect(() => {
 
+  if (appMode !== "firebase") return;
+
   const unsubscribe = onSnapshot(collection(db, "locations"), (snapshot) => {
 
     const data = snapshot.docs.map(doc => ({
@@ -44,7 +46,7 @@ useEffect(() => {
 
   return unsubscribe;
 
-}, []);
+}, [appMode]); 
 
 
 const saveLocationLocal = async (location) => {
@@ -211,20 +213,30 @@ setDescription("");
 
 
 
-  const deleteLocation = async (id) => {
+const deleteLocation = async (id) => {
+
+  if (appMode === "firebase") {
+
     await deleteDoc(doc(db, "locations", id));
 
-   const filteredLocations = locations.filter(
-  (location) => location.id !== id
-);
+  } else {
 
-setLocations(filteredLocations);
+    const stored = await AsyncStorage.getItem(LOCAL_STORAGE_KEY);
+    const local = stored ? JSON.parse(stored) : [];
 
-await AsyncStorage.setItem(
-  "locations",
-  JSON.stringify(filteredLocations)
-);
-  };
+    const updated = local.filter(loc => loc.id !== id);
+
+    await AsyncStorage.setItem(
+      LOCAL_STORAGE_KEY,
+      JSON.stringify(updated)
+    );
+
+    setLocalCount(updated.length);
+    setLocations(updated);
+
+  }
+
+};
 
 
   const editLocation = (location) => {
@@ -318,9 +330,20 @@ const toggleMode = async () => {
 
 setAppMode(newMode);
 
-if (newMode === "local") {
-  loadLocalLocations();
+if (newMode === "firebase") {
+
+  // recargar datos de Firebase
+  setLocations([]);
+
 }
+
+if (newMode === "local") {
+
+  loadLocalLocations();
+
+}
+
+
     }
 
   } else {
