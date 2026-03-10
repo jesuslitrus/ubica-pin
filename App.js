@@ -236,7 +236,7 @@ const toggleMode = () => {
     onPress={toggleMode}
   >
     <Text style={styles.modeText}>
-      {appMode === "firebase" ? "☁ Sync" : "💾 Local"}
+      {appMode === "firebase" ? "☁ Firebase" : "💾 Local"}
     </Text>
   </TouchableOpacity>
 
