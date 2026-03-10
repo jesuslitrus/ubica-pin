@@ -175,14 +175,36 @@ const addLocation = async () => {
 };
 
   let updatedLocations;
-//
-  if (editingId) {
+  //
+if (editingId) {
 
-  const ref = doc(db, "locations", editingId);
+  if (appMode === "firebase") {
 
-  await updateDoc(ref, {
-    description: description
-  });
+    const ref = doc(db, "locations", editingId);
+
+    await updateDoc(ref, {
+      description: description
+    });
+
+  } else {
+
+    const stored = await AsyncStorage.getItem(LOCAL_STORAGE_KEY);
+    const local = stored ? JSON.parse(stored) : [];
+
+    const updated = local.map(loc =>
+      loc.id === editingId
+        ? { ...loc, description: description }
+        : loc
+    );
+
+    await AsyncStorage.setItem(
+      LOCAL_STORAGE_KEY,
+      JSON.stringify(updated)
+    );
+
+    setLocations(updated);
+
+  }
 
   setEditingId(null);
 
@@ -190,22 +212,20 @@ const addLocation = async () => {
 
   if (appMode === "firebase") {
 
-  await addDoc(collection(db, "locations"), newLocation);
+    await addDoc(collection(db, "locations"), newLocation);
 
-} else {
+  } else {
 
-  await saveLocationLocal(newLocation);
-  setLocalCount(prev => prev + 1);
+    await saveLocationLocal(newLocation);
 
-  const updated = [...locations, { id: Date.now().toString(), ...newLocation }];
-  setLocations(updated);
+    setLocalCount(prev => prev + 1);
+
+    const updated = [...locations, { id: Date.now().toString(), ...newLocation }];
+    setLocations(updated);
+
+  }
 
 }
-
-}
-
-setDescription("");
-  setDescription("");
 };
 
 
