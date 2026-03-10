@@ -358,10 +358,10 @@ if (newMode === "local") {
     onPress={toggleMode}
   >
     <Text style={styles.modeText}>
-      appMode === "firebase"
-  ? "☁ Firebase"
-  : `💾 Local${localCount > 0 ? ` (${localCount})` : ""}`
-    </Text>
+  {appMode === "firebase"
+    ? "☁ Firebase"
+    : `💾 Local${localCount > 0 ? ` (${localCount})` : ""}`}
+</Text>
   </TouchableOpacity>
 
 </View>
