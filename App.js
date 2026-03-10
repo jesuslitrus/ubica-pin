@@ -191,14 +191,28 @@ const toggleMode = () => {
 
   const newMode = appMode === "firebase" ? "local" : "firebase";
 
-  Alert.alert(
-    "Cambiar modo",
-    `¿Seguro que quieres cambiar a modo ${newMode}?`,
-    [
-      { text: "Cancelar", style: "cancel" },
-      { text: "Sí", onPress: () => setAppMode(newMode) }
-    ]
-  );
+  if (Platform.OS === "web") {
+
+    const confirmed = window.confirm(
+      `¿Seguro que quieres cambiar a modo ${newMode}?`
+    );
+
+    if (confirmed) {
+      setAppMode(newMode);
+    }
+
+  } else {
+
+    Alert.alert(
+      "Cambiar modo",
+      `¿Seguro que quieres cambiar a modo ${newMode}?`,
+      [
+        { text: "Cancelar", style: "cancel" },
+        { text: "Sí", onPress: () => setAppMode(newMode) }
+      ]
+    );
+
+  }
 
 };
 
