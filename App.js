@@ -212,24 +212,20 @@ const toggleMode = () => {
   return (
     <View style={styles.container}>
 
-      <View style={styles.headerRow}>
-  <View style={styles.headerRow}>
+
+<View style={styles.headerRow}>
 
   <Text style={styles.title}>📍 Ubica-Pin</Text>
 
-  <View style={styles.modeBadge}>
+  <TouchableOpacity
+    style={styles.modeBadge}
+    onPress={toggleMode}
+  >
     <Text style={styles.modeText}>
       {appMode === "firebase" ? "☁ Sync" : "💾 Local"}
     </Text>
-  </View>
-
-</View>
-
-  <TouchableOpacity
-  style={styles.modeBadge}
-  onPress={toggleMode}
->
   </TouchableOpacity>
+
 </View>
 
       <TextInput
