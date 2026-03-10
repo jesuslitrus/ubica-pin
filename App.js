@@ -194,7 +194,13 @@ const confirmDelete = (id) => {
   return (
     <View style={styles.container}>
 
-      <Text style={styles.title}>📍 Ubica-Pin</Text>
+      <View style={styles.headerRow}>
+  <Text style={styles.title}>📍 Ubica-Pin</Text>
+
+  <View style={styles.modeBadge}>
+    <Text style={styles.modeText}>☁ Firebase</Text>
+  </View>
+</View>
 
       <TextInput
         style={styles.input}
@@ -482,5 +488,26 @@ topButtonRow: {
   justifyContent: "space-between",
   marginBottom: 20
 },
+
+headerRow: {
+  flexDirection: "row",
+  justifyContent: "space-between",
+  alignItems: "center",
+  marginBottom: 20
+},
+
+modeBadge: {
+  backgroundColor: "#007AFF",
+  paddingHorizontal: 10,
+  paddingVertical: 4,
+  borderRadius: 12
+},
+
+modeText: {
+  color: "white",
+  fontSize: 12,
+  fontWeight: "bold"
+},
+
 
 });
