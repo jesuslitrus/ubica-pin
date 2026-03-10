@@ -26,6 +26,7 @@ export default function App() {
   const [editingId, setEditingId] = useState(null);
  
   const [showMap, setShowMap] = useState(false);
+  const [localCount, setLocalCount] = useState(0);
 
 
 useEffect(() => {
@@ -75,7 +76,16 @@ const loadLocalLocations = async () => {
   const stored = await AsyncStorage.getItem(LOCAL_STORAGE_KEY);
 
   if (stored) {
-    setLocations(JSON.parse(stored));
+
+    const data = JSON.parse(stored);
+
+    setLocations(data);
+    setLocalCount(data.length);
+
+  } else {
+
+    setLocalCount(0);
+
   }
 
 };
@@ -99,6 +109,7 @@ const syncLocalToFirebase = async () => {
   }
 
   await AsyncStorage.removeItem(LOCAL_STORAGE_KEY);
+  setLocalCount(0);
 
 };
 const shareLocation = async (location) => {
@@ -182,6 +193,7 @@ const addLocation = async () => {
 } else {
 
   await saveLocationLocal(newLocation);
+  setLocalCount(prev => prev + 1);
 
   const updated = [...locations, { id: Date.now().toString(), ...newLocation }];
   setLocations(updated);
@@ -346,7 +358,9 @@ if (newMode === "local") {
     onPress={toggleMode}
   >
     <Text style={styles.modeText}>
-      {appMode === "firebase" ? "☁ Firebase" : "💾 Local"}
+      appMode === "firebase"
+  ? "☁ Firebase"
+  : `💾 Local${localCount > 0 ? ` (${localCount})` : ""}`
     </Text>
   </TouchableOpacity>
 
