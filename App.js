@@ -20,6 +20,7 @@ if (Platform.OS !== "web") {
 export default function App() {
 
   const [locations, setLocations] = useState([]);
+  const [appMode, setAppMode] = useState("firebase");
   const [description, setDescription] = useState("");
   const [editingId, setEditingId] = useState(null);
  
@@ -186,6 +187,21 @@ const confirmDelete = (id) => {
 };
 
 
+const toggleMode = () => {
+
+  const newMode = appMode === "firebase" ? "local" : "firebase";
+
+  Alert.alert(
+    "Cambiar modo",
+    `¿Seguro que quieres cambiar a modo ${newMode}?`,
+    [
+      { text: "Cancelar", style: "cancel" },
+      { text: "Sí", onPress: () => setAppMode(newMode) }
+    ]
+  );
+
+};
+
 
 
 
@@ -203,15 +219,17 @@ const confirmDelete = (id) => {
 
   <View style={styles.modeBadge}>
     <Text style={styles.modeText}>
-      {APP_MODE === "firebase" ? "☁ Sync" : "💾 Local"}
+      {appMode === "firebase" ? "☁ Sync" : "💾 Local"}
     </Text>
   </View>
 
 </View>
 
-  <View style={styles.modeBadge}>
-    <Text style={styles.modeText}>☁ Firebase</Text>
-  </View>
+  <TouchableOpacity
+  style={styles.modeBadge}
+  onPress={toggleMode}
+>
+  </TouchableOpacity>
 </View>
 
       <TextInput
