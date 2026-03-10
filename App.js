@@ -6,6 +6,8 @@ import { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { db } from "./firebase";
 import { collection, addDoc, deleteDoc, updateDoc, doc, onSnapshot } from "firebase/firestore";
+const APP_MODE = "firebase";
+
 let MapView = null;
 let Marker = null;
 
@@ -195,7 +197,17 @@ const confirmDelete = (id) => {
     <View style={styles.container}>
 
       <View style={styles.headerRow}>
+  <View style={styles.headerRow}>
+
   <Text style={styles.title}>📍 Ubica-Pin</Text>
+
+  <View style={styles.modeBadge}>
+    <Text style={styles.modeText}>
+      {APP_MODE === "firebase" ? "☁ Sync" : "💾 Local"}
+    </Text>
+  </View>
+
+</View>
 
   <View style={styles.modeBadge}>
     <Text style={styles.modeText}>☁ Firebase</Text>
@@ -508,6 +520,11 @@ modeText: {
   fontSize: 12,
   fontWeight: "bold"
 },
+
+
+
+
+
 
 
 });
