@@ -7,6 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { db } from "./firebase";
 import { collection, addDoc, deleteDoc, updateDoc, doc, onSnapshot } from "firebase/firestore";
 const APP_MODE = "firebase";
+const LOCAL_STORAGE_KEY = "ubicapin_locations";
 
 let MapView = null;
 let Marker = null;
@@ -45,11 +46,39 @@ useEffect(() => {
 }, []);
 
 
+const saveLocationLocal = async (location) => {
+
+  const stored = await AsyncStorage.getItem(LOCAL_STORAGE_KEY);
+
+  let locationsLocal = stored ? JSON.parse(stored) : [];
+
+  locationsLocal.push({
+    id: Date.now().toString(),
+    ...location
+  });
+
+  await AsyncStorage.setItem(
+    LOCAL_STORAGE_KEY,
+    JSON.stringify(locationsLocal)
+  );
+
+};
+
 const openMaps = (lat, lng) => {
   const url = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
   Linking.openURL(url);
 };
 
+
+const loadLocalLocations = async () => {
+
+  const stored = await AsyncStorage.getItem(LOCAL_STORAGE_KEY);
+
+  if (stored) {
+    setLocations(JSON.parse(stored));
+  }
+
+};
 const shareLocation = async (location) => {
 
   const url = `https://www.google.com/maps/search/?api=1&query=${location.latitude},${location.longitude}`;
@@ -124,7 +153,18 @@ const addLocation = async () => {
 
 } else {
 
+  if (appMode === "firebase") {
+
   await addDoc(collection(db, "locations"), newLocation);
+
+} else {
+
+  await saveLocationLocal(newLocation);
+
+  const updated = [...locations, { id: Date.now().toString(), ...newLocation }];
+  setLocations(updated);
+
+}
 
 }
 
@@ -199,6 +239,10 @@ const toggleMode = () => {
 
     if (confirmed) {
       setAppMode(newMode);
+
+if (newMode === "local") {
+  loadLocalLocations();
+}
     }
 
   } else {
