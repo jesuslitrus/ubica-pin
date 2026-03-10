@@ -207,6 +207,7 @@ if (editingId) {
   }
 
   setEditingId(null);
+  setDescription("");
 
 } else {
 
@@ -242,17 +243,17 @@ const deleteLocation = async (id) => {
   } else {
 
     const stored = await AsyncStorage.getItem(LOCAL_STORAGE_KEY);
-    const local = stored ? JSON.parse(stored) : [];
+const local = stored ? JSON.parse(stored) : [];
 
-    const updated = local.filter(loc => loc.id !== id);
+const updated = local.filter(loc => loc.id !== id);
 
-    await AsyncStorage.setItem(
-      LOCAL_STORAGE_KEY,
-      JSON.stringify(updated)
-    );
+await AsyncStorage.setItem(
+  LOCAL_STORAGE_KEY,
+  JSON.stringify(updated)
+);
 
-    setLocalCount(updated.length);
-    setLocations(updated);
+setLocalCount(updated.length);
+setLocations(updated);
 
   }
 
@@ -349,6 +350,8 @@ const toggleMode = async () => {
 }
 
 setAppMode(newMode);
+setEditingId(null);
+setDescription("");
 
 if (newMode === "firebase") {
 
@@ -359,6 +362,7 @@ if (newMode === "firebase") {
 
 if (newMode === "local") {
 
+  setLocations([]);
   loadLocalLocations();
 
 }
