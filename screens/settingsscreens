@@ -1,0 +1,48 @@
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { useNavigation } from '@react-navigation/native';
+
+
+export default function SettingsScreen() {
+
+  return (
+    <View style={styles.container}>
+
+      <Text style={styles.title}>⚙️ Ajustes</Text>
+
+      <TouchableOpacity style={styles.button}>
+        <Text style={styles.text}>Exportar ubicaciones</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.button}>
+        <Text style={styles.text}>Importar ubicaciones</Text>
+      </TouchableOpacity>
+
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+
+  container:{
+    flex:1,
+    padding:20
+  },
+
+  title:{
+    fontSize:22,
+    fontWeight:"bold",
+    marginBottom:20
+  },
+
+  button:{
+    backgroundColor:"#eee",
+    padding:15,
+    borderRadius:10,
+    marginBottom:10
+  },
+
+  text:{
+    fontSize:16
+  }
+
+});
