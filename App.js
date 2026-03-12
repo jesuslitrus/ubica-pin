@@ -27,6 +27,7 @@ export default function App() {
  
   const [showMap, setShowMap] = useState(false);
   const [localCount, setLocalCount] = useState(0);
+  const [showSettings, setShowSettings] = useState(false);
 
 
 useEffect(() => {
@@ -399,6 +400,9 @@ if (newMode === "local") {
 <View style={styles.headerRow}>
 
   <Text style={styles.title}>📍 Ubica-Pin</Text>
+  <TouchableOpacity onPress={() => setShowSettings(!showSettings)}>
+  <Text style={{fontSize:22}}>⚙️</Text>
+</TouchableOpacity>
 
   <TouchableOpacity
     style={styles.modeBadge}
@@ -412,6 +416,22 @@ if (newMode === "local") {
   </TouchableOpacity>
 
 </View>
+
+{showSettings && (
+  <View style={styles.settingsPanel}>
+
+    <Text style={styles.settingsTitle}>⚙️ Ajustes</Text>
+
+    <TouchableOpacity style={styles.settingsButton}>
+      <Text>Exportar ubicaciones</Text>
+    </TouchableOpacity>
+
+    <TouchableOpacity style={styles.settingsButton}>
+      <Text>Importar ubicaciones</Text>
+    </TouchableOpacity>
+
+  </View>
+)}
 
       <TextInput
         style={styles.input}
@@ -718,6 +738,25 @@ modeText: {
   color: "white",
   fontSize: 12,
   fontWeight: "bold"
+},
+
+settingsPanel: {
+  backgroundColor: "#ffffff",
+  padding: 15,
+  borderRadius: 10,
+  marginBottom: 20
+},
+
+settingsTitle: {
+  fontSize: 18,
+  fontWeight: "bold",
+  marginBottom: 10
+},
+
+settingsButton: {
+  padding: 10,
+  borderBottomWidth: 1,
+  borderBottomColor: "#ddd"
 },
 
 
