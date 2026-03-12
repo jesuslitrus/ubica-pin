@@ -433,6 +433,13 @@ if (newMode === "local") {
   return (
     
     <View style={styles.container}>
+    <TouchableOpacity
+  style={styles.settingsIcon}
+  onPress={() => setShowMenu(true)}
+>
+  <Text style={{fontSize:24}}>⚙️</Text>
+</TouchableOpacity>
+
 
 
 <View style={styles.headerRow}>
@@ -830,6 +837,12 @@ modalClose:{
   alignItems:"center"
 },
 
+settingsIcon:{
+  position:"absolute",
+  top:60,
+  right:20,
+  zIndex:10
+},
 
 
 
