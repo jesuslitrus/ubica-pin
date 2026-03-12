@@ -439,9 +439,7 @@ if (newMode === "local") {
 
   <Text style={styles.title}>📍 Ubica-Pin</Text>
 
-  <TouchableOpacity onPress={() => setShowMenu(true)}>
-  <Text style={{fontSize:22, marginRight:10}}>⚙️</Text>
-</TouchableOpacity>
+  
   <TouchableOpacity onPress={() => setShowSettings(!showSettings)}>
   <Text style={{fontSize:22}}>⚙️</Text>
 </TouchableOpacity>
