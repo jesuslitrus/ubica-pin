@@ -393,7 +393,6 @@ if (newMode === "local") {
 
 
 
-
 const exportLocations = () => {
 
   if (!locations || locations.length === 0) {
@@ -418,6 +417,9 @@ const exportLocations = () => {
 
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+
+    // ✅ AQUÍ AÑADIMOS EL AVISO
+    alert("Archivo descargado: ubicapin_locations.json");
 
   } else {
 
