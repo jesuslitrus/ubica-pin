@@ -16,16 +16,22 @@ return (
 
     <View style={styles.menu}>
 
-      <TouchableOpacity
-        style={styles.item}
-        onPress={onExport}
-      >
+     <TouchableOpacity
+  style={styles.item}
+  onPress={() => {
+    onClose();
+    onExport();
+  }}
+>
         <Text>Exportar ubicaciones</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.item}
-        onPress={onImport}
+        onPress={() => {
+  onClose();
+  onImport();
+}}
       >
         <Text>Importar ubicaciones</Text>
       </TouchableOpacity>
