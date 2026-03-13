@@ -394,13 +394,9 @@ if (newMode === "local") {
 
 
 
-  const exportLocations = () => {
-
-    Alert.alert("Exportar", "Botón funcionando");
-  //
 const exportLocations = () => {
 
-  if (!locations.length) {
+  if (!locations || locations.length === 0) {
     alert("No hay ubicaciones para exportar");
     return;
   }
@@ -411,9 +407,17 @@ const exportLocations = () => {
 
     const blob = new Blob([json], { type: "application/json" });
 
-    const url = window.URL.createObjectURL(blob);
+    const url = URL.createObjectURL(blob);
 
-    window.open(url);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "ubicapin_locations.json";
+
+    document.body.appendChild(link);
+    link.click();
+
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
 
   } else {
 
@@ -423,8 +427,6 @@ const exportLocations = () => {
     });
 
   }
-
-};
 
 };
 
