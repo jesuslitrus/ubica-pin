@@ -1,6 +1,6 @@
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 
-export default function SettingsMenu({ visible, onExport, onImport }) {
+export default function SettingsMenu({ visible, onClose, onExport, onImport }) {
 
   if (!visible) return null;
 
