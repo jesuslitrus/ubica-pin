@@ -850,6 +850,13 @@ settingsButton: {
   zIndex: 10
 },
 
+settingsButton: {
+  position: "absolute",
+  top: 10,
+  right: 15,
+  zIndex: 20
+},
+
 
 
 
