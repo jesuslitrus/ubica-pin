@@ -396,6 +396,7 @@ if (newMode === "local") {
 
   const exportLocations = () => {
 
+    Alert.alert("Exportar", "Botón funcionando");
   const exportLocations = async () => {
 
   try {
