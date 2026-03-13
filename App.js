@@ -142,17 +142,30 @@ const addLocation = async () => {
 
   if (Platform.OS === "web") {
 
-    coords = await new Promise((resolve, reject) => {
-      navigator.geolocation.getCurrentPosition(
-        (position) => resolve(position.coords),
-        (error) => reject(error),
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 0
-        }
-      );
-    });
+ coords = await new Promise((resolve) => {
+
+  if (!navigator.geolocation) {
+    alert("Geolocalización no disponible");
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    (position) => resolve(position.coords),
+    (error) => {
+      alert("No se pudo obtener la ubicación");
+      resolve({
+        latitude: 40.4168,
+        longitude: -3.7038
+      });
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 0
+    }
+  );
+
+});
 
   } else {
 
