@@ -1,4 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
+import * as FileSystem from "expo-file-system";
+import * as Sharing from "expo-sharing";
+import * as DocumentPicker from "expo-document-picker";
 import { StyleSheet, Text, View, FlatList, TouchableOpacity, Linking, TextInput, Alert, Platform, Share } from 'react-native';
 import * as Location from 'expo-location';
 
@@ -393,13 +396,84 @@ if (newMode === "local") {
 
   const exportLocations = () => {
 
-  console.log("Exportar ubicaciones");
+  const exportLocations = async () => {
+
+  try {
+
+    const data = JSON.stringify(locations, null, 2);
+
+    const fileUri = FileSystem.documentDirectory + "ubicapin_locations.json";
+
+    await FileSystem.writeAsStringAsync(fileUri, data);
+
+    await Sharing.shareAsync(fileUri);
+
+  } catch (error) {
+
+    console.log("Error exportando:", error);
+
+  }
 
 };
 
-const importLocations = () => {
+};
 
-  console.log("Importar ubicaciones");
+const importLocations = async () => {
+
+  try {
+
+    const result = await DocumentPicker.getDocumentAsync({
+      type: "application/json"
+    });
+
+    if (result.canceled) return;
+
+    const fileUri = result.assets[0].uri;
+
+    const content = await FileSystem.readAsStringAsync(fileUri);
+
+    const importedLocations = JSON.parse(content);
+
+    if (!Array.isArray(importedLocations)) {
+
+      alert("Archivo inválido");
+      return;
+
+    }
+
+    if (appMode === "firebase") {
+
+      for (const loc of importedLocations) {
+
+        const { id, ...data } = loc;
+
+        await addDoc(collection(db, "locations"), data);
+
+      }
+
+    } else {
+
+      const stored = await AsyncStorage.getItem(LOCAL_STORAGE_KEY);
+
+      const local = stored ? JSON.parse(stored) : [];
+
+      const merged = [...local, ...importedLocations];
+
+      await AsyncStorage.setItem(
+        LOCAL_STORAGE_KEY,
+        JSON.stringify(merged)
+      );
+
+      setLocations(merged);
+      setLocalCount(merged.length);
+
+    }
+
+  } catch (error) {
+
+    console.log("Error importando:", error);
+
+  }
 
 };
 
