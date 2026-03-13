@@ -397,21 +397,44 @@ if (newMode === "local") {
   const exportLocations = () => {
 
     Alert.alert("Exportar", "Botón funcionando");
-  const exportLocations = async () => {
+  
+ const exportLocations = async () => {
 
   try {
 
-    const data = JSON.stringify(locations, null, 2);
+    if (!locations.length) {
+      alert("No hay ubicaciones para exportar");
+      return;
+    }
 
-    const fileUri = FileSystem.documentDirectory + "ubicapin_locations.json";
+    const json = JSON.stringify(locations, null, 2);
 
-    await FileSystem.writeAsStringAsync(fileUri, data);
+    if (Platform.OS === "web") {
 
-    await Sharing.shareAsync(fileUri);
+      const blob = new Blob([json], { type: "application/json" });
 
-  } catch (error) {
+      const url = URL.createObjectURL(blob);
 
-    console.log("Error exportando:", error);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "ubicapin_locations.json";
+      a.click();
+
+      URL.revokeObjectURL(url);
+
+    } else {
+
+      await Share.share({
+        message: json,
+        title: "Ubica-Pin locations"
+      });
+
+    }
+
+  } catch (err) {
+
+    console.log(err);
+    alert("Error exportando");
 
   }
 
