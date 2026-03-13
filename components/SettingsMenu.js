@@ -4,7 +4,14 @@ export default function SettingsMenu({ visible, onExport, onImport }) {
 
   if (!visible) return null;
 
-  return (
+return (
+
+  <View style={styles.overlay}>
+
+    <TouchableOpacity
+      style={styles.background}
+      onPress={onClose}
+    />
 
     <View style={styles.menu}>
 
@@ -24,7 +31,9 @@ export default function SettingsMenu({ visible, onExport, onImport }) {
 
     </View>
 
-  );
+  </View>
+
+);
 
 }
 
@@ -47,6 +56,22 @@ const styles = StyleSheet.create({
     padding:15,
     borderBottomWidth:1,
     borderBottomColor:"#eee"
-  }
+  },
+  
+  overlay:{
+  position:"absolute",
+  top:0,
+  left:0,
+  right:0,
+  bottom:0
+},
+
+background:{
+  position:"absolute",
+  top:0,
+  left:0,
+  right:0,
+  bottom:0
+},
 
 });

@@ -556,6 +556,7 @@ const importLocations = () => {
 
 <SettingsMenu
   visible={showMenu}
+  onClose={() => setShowMenu(false)}
   onExport={exportLocations}
   onImport={importLocations}
 />
