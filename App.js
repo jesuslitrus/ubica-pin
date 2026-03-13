@@ -398,7 +398,7 @@ if (newMode === "local") {
 
     Alert.alert("Exportar", "Botón funcionando");
   //
- const exportLocations = () => {
+const exportLocations = () => {
 
   if (!locations.length) {
     alert("No hay ubicaciones para exportar");
@@ -407,18 +407,22 @@ if (newMode === "local") {
 
   const json = JSON.stringify(locations, null, 2);
 
-  const blob = new Blob([json], { type: "application/json" });
+  if (Platform.OS === "web") {
 
-  const url = URL.createObjectURL(blob);
+    const blob = new Blob([json], { type: "application/json" });
 
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "ubicapin_locations.json";
-  document.body.appendChild(a);
-  a.click();
+    const url = window.URL.createObjectURL(blob);
 
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+    window.open(url);
+
+  } else {
+
+    Share.share({
+      message: json,
+      title: "Ubica-Pin locations"
+    });
+
+  }
 
 };
 
