@@ -10,6 +10,7 @@ return (
 
     <TouchableOpacity
       style={styles.background}
+      activeOpacity={1}
       onPress={onClose}
     />
 
@@ -40,14 +41,15 @@ return (
 const styles = StyleSheet.create({
 
   overlay:{
-  position:"absolute",
-  top:0,
-  left:0,
-  right:0,
-  bottom:0,
-  backgroundColor:"rgba(0,0,0,0.2)",
-  zIndex:1000
-},
+    position:"absolute",
+    top:0,
+    left:0,
+    right:0,
+    bottom:0,
+    justifyContent:"flex-start",
+    alignItems:"flex-end",
+    zIndex:1000
+  },
 
   background:{
     position:"absolute",
@@ -58,13 +60,12 @@ const styles = StyleSheet.create({
   },
 
   menu:{
-    position:"absolute",
-    top:70,
-    right:10,
+    marginTop:70,
+    marginRight:10,
     width:200,
     backgroundColor:"#ffffff",
     borderRadius:10,
-    elevation:5,
+    elevation:6,
     shadowColor:"#000",
     shadowOpacity:0.2,
     shadowOffset:{width:0,height:2}
