@@ -510,7 +510,8 @@ const importLocations = async () => {
 
   <Text style={styles.title}>📍 Ubica-Pin</Text>
 
-  <TouchableOpacity
+<TouchableOpacity
+  style={styles.settingsButton}
   onPress={() => setShowMenu(!showMenu)}
 >
   <Text style={{fontSize:22}}>⚙️</Text>
@@ -841,6 +842,12 @@ modeText: {
   color: "white",
   fontSize: 12,
   fontWeight: "bold"
+},
+settingsButton: {
+  position: "absolute",
+  top: 20,
+  right: 20,
+  zIndex: 10
 },
 
 
