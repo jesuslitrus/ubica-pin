@@ -397,46 +397,28 @@ if (newMode === "local") {
   const exportLocations = () => {
 
     Alert.alert("Exportar", "Botón funcionando");
-  
- const exportLocations = async () => {
+  //
+ const exportLocations = () => {
 
-  try {
-
-    if (!locations.length) {
-      alert("No hay ubicaciones para exportar");
-      return;
-    }
-
-    const json = JSON.stringify(locations, null, 2);
-
-    if (Platform.OS === "web") {
-
-      const blob = new Blob([json], { type: "application/json" });
-
-      const url = URL.createObjectURL(blob);
-
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "ubicapin_locations.json";
-      a.click();
-
-      URL.revokeObjectURL(url);
-
-    } else {
-
-      await Share.share({
-        message: json,
-        title: "Ubica-Pin locations"
-      });
-
-    }
-
-  } catch (err) {
-
-    console.log(err);
-    alert("Error exportando");
-
+  if (!locations.length) {
+    alert("No hay ubicaciones para exportar");
+    return;
   }
+
+  const json = JSON.stringify(locations, null, 2);
+
+  const blob = new Blob([json], { type: "application/json" });
+
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "ubicapin_locations.json";
+  document.body.appendChild(a);
+  a.click();
+
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 
 };
 
