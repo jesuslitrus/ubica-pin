@@ -1,11 +1,12 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, FlatList, TouchableOpacity, Linking, TextInput, Alert, Platform, Share, Modal } from 'react-native';
+import { StyleSheet, Text, View, FlatList, TouchableOpacity, Linking, TextInput, Alert, Platform, Share } from 'react-native';
 import * as Location from 'expo-location';
 
 import { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { db } from "./firebase";
 import { collection, addDoc, deleteDoc, updateDoc, doc, onSnapshot } from "firebase/firestore";
+import SettingsMenu from "./components/SettingsMenu";
 
 const LOCAL_STORAGE_KEY = "ubicapin_locations";
 
@@ -28,8 +29,6 @@ export default function App() {
   const [showMap, setShowMap] = useState(false);
   const [localCount, setLocalCount] = useState(0);
   const [showMenu, setShowMenu] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
-
 
 useEffect(() => {
 
@@ -392,62 +391,29 @@ if (newMode === "local") {
 
 
 
-  
-<Modal
-  visible={showMenu}
-  transparent={true}
-  animationType="fade"
->
+  const exportLocations = () => {
 
-<View style={styles.modalOverlay}>
+  console.log("Exportar ubicaciones");
 
-<View style={styles.modalMenu}>
+};
 
-<Text style={styles.modalTitle}>Ajustes</Text>
+const importLocations = () => {
 
-<TouchableOpacity
-  style={styles.modalButton}
-  onPress={() => setShowMenu(false)}
->
-<Text>Exportar ubicaciones</Text>
-</TouchableOpacity>
+  console.log("Importar ubicaciones");
 
-<TouchableOpacity
-  style={styles.modalButton}
-  onPress={() => setShowMenu(false)}
->
-<Text>Importar ubicaciones</Text>
-</TouchableOpacity>
+};
 
-<TouchableOpacity
-  style={styles.modalClose}
-  onPress={() => setShowMenu(false)}
->
-<Text>Cerrar</Text>
-</TouchableOpacity>
-
-</View>
-</View>
-
-</Modal>
   return (
-    
     <View style={styles.container}>
-    <TouchableOpacity
-  style={styles.settingsIcon}
-  onPress={() => setShowMenu(true)}
->
-  <Text style={{fontSize:24}}>⚙️</Text>
-</TouchableOpacity>
-
 
 
 <View style={styles.headerRow}>
 
   <Text style={styles.title}>📍 Ubica-Pin</Text>
 
-  
-  <TouchableOpacity onPress={() => setShowSettings(!showSettings)}>
+  <TouchableOpacity
+  onPress={() => setShowMenu(!showMenu)}
+>
   <Text style={{fontSize:22}}>⚙️</Text>
 </TouchableOpacity>
 
@@ -464,21 +430,6 @@ if (newMode === "local") {
 
 </View>
 
-{showSettings && (
-  <View style={styles.settingsPanel}>
-
-    <Text style={styles.settingsTitle}>⚙️ Ajustes</Text>
-
-    <TouchableOpacity style={styles.settingsButton}>
-      <Text>Exportar ubicaciones</Text>
-    </TouchableOpacity>
-
-    <TouchableOpacity style={styles.settingsButton}>
-      <Text>Importar ubicaciones</Text>
-    </TouchableOpacity>
-
-  </View>
-)}
 
       <TextInput
         style={styles.input}
@@ -603,6 +554,11 @@ if (newMode === "local") {
         )}
       />
 
+<SettingsMenu
+  visible={showMenu}
+  onExport={exportLocations}
+  onImport={importLocations}
+/>
       <StatusBar style="auto" />
     </View>
   );
@@ -787,62 +743,8 @@ modeText: {
   fontWeight: "bold"
 },
 
-settingsPanel: {
-  backgroundColor: "#ffffff",
-  padding: 15,
-  borderRadius: 10,
-  marginBottom: 20
-},
 
-settingsTitle: {
-  fontSize: 18,
-  fontWeight: "bold",
-  marginBottom: 10
-},
 
-settingsButton: {
-  padding: 10,
-  borderBottomWidth: 1,
-  borderBottomColor: "#ddd"
-},
-
-modalOverlay:{
-  flex:1,
-  backgroundColor:"rgba(0,0,0,0.4)",
-  justifyContent:"center",
-  alignItems:"center"
-},
-
-modalMenu:{
-  width:250,
-  backgroundColor:"white",
-  padding:20,
-  borderRadius:10
-},
-
-modalTitle:{
-  fontSize:18,
-  fontWeight:"bold",
-  marginBottom:10
-},
-
-modalButton:{
-  paddingVertical:10,
-  borderBottomWidth:1,
-  borderBottomColor:"#ddd"
-},
-
-modalClose:{
-  marginTop:10,
-  alignItems:"center"
-},
-
-settingsIcon:{
-  position:"absolute",
-  top:60,
-  right:20,
-  zIndex:10
-},
 
 
 
