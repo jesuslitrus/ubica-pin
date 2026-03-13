@@ -845,8 +845,8 @@ modeText: {
 },
 settingsButton: {
   position: "absolute",
-  top: 20,
-  right: 20,
+  top: 5,
+  right: 5,
   zIndex: 10
 },
 
