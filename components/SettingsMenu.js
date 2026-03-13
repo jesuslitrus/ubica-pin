@@ -39,12 +39,29 @@ return (
 
 const styles = StyleSheet.create({
 
+  overlay:{
+    position:"absolute",
+    top:0,
+    left:0,
+    right:0,
+    bottom:0,
+    zIndex:1000
+  },
+
+  background:{
+    position:"absolute",
+    top:0,
+    left:0,
+    right:0,
+    bottom:0
+  },
+
   menu:{
     position:"absolute",
     top:70,
     right:10,
     width:200,
-    backgroundColor:"#fff",
+    backgroundColor:"#ffffff",
     borderRadius:10,
     elevation:5,
     shadowColor:"#000",
@@ -56,22 +73,6 @@ const styles = StyleSheet.create({
     padding:15,
     borderBottomWidth:1,
     borderBottomColor:"#eee"
-  },
-  
-  overlay:{
-  position:"absolute",
-  top:0,
-  left:0,
-  right:0,
-  bottom:0
-},
-
-background:{
-  position:"absolute",
-  top:0,
-  left:0,
-  right:0,
-  bottom:0
-},
+  }
 
 });
