@@ -502,25 +502,25 @@ const importLocations = async () => {
 
 };
 
-  return (
-    <View style={styles.container}>
+return (
+  <View style={styles.container}>
 
+    <TouchableOpacity
+      style={styles.settingsButton}
+      onPress={() => setShowMenu(!showMenu)}
+    >
+      <Text style={{fontSize:22}}>⚙️</Text>
+    </TouchableOpacity>
 
-<View style={styles.headerRow}>
+    <View style={styles.headerRow}>
 
-  <Text style={styles.title}>📍 Ubica-Pin</Text>
+      <Text style={styles.title}>📍 Ubica-Pin</Text>
 
-<TouchableOpacity
-  style={styles.settingsButton}
-  onPress={() => setShowMenu(!showMenu)}
->
-  <Text style={{fontSize:22}}>⚙️</Text>
-</TouchableOpacity>
-
-  <TouchableOpacity
-    style={styles.modeBadge}
-    onPress={toggleMode}
-  >
+      <TouchableOpacity
+        style={styles.modeBadge}
+        onPress={toggleMode}
+      >
+    
     <Text style={styles.modeText}>
   {appMode === "firebase"
     ? "☁ Sync"
