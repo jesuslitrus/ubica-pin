@@ -212,9 +212,22 @@ const addLocation = async () => {
 
   if (appMode === "firebase") {
 
-    await addDoc(collection(db, "locations"), newLocation);
+  if (editingId) {
+
+    // actualizar ubicación existente
+    await updateDoc(
+      doc(db, "locations", editingId),
+      newLocation
+    );
 
   } else {
+
+    // crear nueva ubicación
+    await addDoc(collection(db, "locations"), newLocation);
+
+  }
+
+} else {
 
     await saveLocationLocal(newLocation);
 
