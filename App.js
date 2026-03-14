@@ -242,6 +242,8 @@ if (editingId) {
     setLocations(updated);
 
   }
+setDescription("");
+setEditingId(null);
 
 }
 };
