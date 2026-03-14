@@ -212,9 +212,22 @@ const addLocation = async () => {
 
   if (appMode === "firebase") {
 
-    await addDoc(collection(db, "locations"), newLocation);
+  if (editingId) {
+
+    // actualizar ubicación existente
+    await updateDoc(
+      doc(db, "locations", editingId),
+      newLocation
+    );
 
   } else {
+
+    // crear nueva ubicación
+    await addDoc(collection(db, "locations"), newLocation);
+
+  }
+
+} else {
 
     await saveLocationLocal(newLocation);
 
@@ -408,7 +421,20 @@ const exportLocations = () => {
 
     const link = document.createElement("a");
     link.href = url;
-    link.download = "ubicapin_locations.json";
+    const now = new Date();
+
+const date =
+  now.getFullYear() + "-" +
+  String(now.getMonth() + 1).padStart(2, "0") + "-" +
+  String(now.getDate()).padStart(2, "0");
+
+const time =
+  String(now.getHours()).padStart(2, "0") + "-" +
+  String(now.getMinutes()).padStart(2, "0");
+
+const filename = `ubicapin_${date}_${time}.json`;
+
+link.download = filename;
 
     document.body.appendChild(link);
     link.click();
