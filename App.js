@@ -404,37 +404,44 @@ if (newMode === "local") {
 
 
 //
-const exportLocations = () => {
+const exportLocations = async () => {
 
   if (!locations || locations.length === 0) {
-    alert("No hay ubicaciones para exportar");
+    Alert.alert("Exportar", "No hay ubicaciones para exportar");
     return;
   }
 
-  const json = JSON.stringify(locations, null, 2);
+  try {
 
-  if (Platform.OS === "web") {
+    const json = JSON.stringify(locations, null, 2);
 
-    const blob = new Blob([json], { type: "application/json" });
+    const fileUri =
+      FileSystem.documentDirectory + "ubicapin_locations.json";
 
-    const url = URL.createObjectURL(blob);
-
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "ubicapin_locations.json";
-
-    document.body.appendChild(link);
-    link.click();
-
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-
-  } else {
-
-    Share.share({
-      message: json,
-      title: "Ubica-Pin locations"
+    await FileSystem.writeAsStringAsync(fileUri, json, {
+      encoding: FileSystem.EncodingType.UTF8
     });
+
+    if (Platform.OS === "web") {
+
+      const blob = new Blob([json], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "ubicapin_locations.json";
+      link.click();
+
+    } else {
+
+      await Sharing.shareAsync(fileUri);
+
+    }
+
+  } catch (err) {
+
+    console.log("Error exportando:", err);
+    Alert.alert("Error", "No se pudo exportar el archivo");
 
   }
 
