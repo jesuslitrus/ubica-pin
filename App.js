@@ -151,7 +151,7 @@ const addLocation = async () => {
         return;
       }
 
-      coords = await new Promise((resolve) => {
+      coords = await new Promise((resolve, reject) => {
 
         navigator.geolocation.getCurrentPosition(
           (position) => resolve(position.coords),
@@ -159,6 +159,7 @@ const addLocation = async () => {
           (error) => {
             console.log("Error GPS:", error);
 
+            // fallback si falla GPS
             resolve({
               latitude: 40.4168,
               longitude: -3.7038
@@ -211,51 +212,29 @@ const addLocation = async () => {
 
   if (appMode === "firebase") {
 
-    if (editingId) {
+  if (editingId) {
 
-      await updateDoc(
-        doc(db, "locations", editingId),
-        newLocation
-      );
-
-    } else {
-
-      await addDoc(collection(db, "locations"), newLocation);
-
-    }
+    // actualizar ubicación existente
+    await updateDoc(
+      doc(db, "locations", editingId),
+      newLocation
+    );
 
   } else {
 
-    if (editingId) {
+    // crear nueva ubicación
+    await addDoc(collection(db, "locations"), newLocation);
 
-      const stored = await AsyncStorage.getItem(LOCAL_STORAGE_KEY);
-      const local = stored ? JSON.parse(stored) : [];
+  }
 
-      const updated = local.map(loc =>
-        loc.id === editingId ? { ...loc, ...newLocation } : loc
-      );
+} else {
 
-      await AsyncStorage.setItem(
-        LOCAL_STORAGE_KEY,
-        JSON.stringify(updated)
-      );
+    await saveLocationLocal(newLocation);
 
-      setLocations(updated);
+    setLocalCount(prev => prev + 1);
 
-    } else {
-
-      await saveLocationLocal(newLocation);
-
-      setLocalCount(prev => prev + 1);
-
-      const updated = [
-        ...locations,
-        { id: Date.now().toString(), ...newLocation }
-      ];
-
-      setLocations(updated);
-
-    }
+    const updated = [...locations, { id: Date.now().toString(), ...newLocation }];
+    setLocations(updated);
 
   }
 
