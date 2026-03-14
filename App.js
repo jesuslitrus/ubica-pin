@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import * as FileSystem from "expo-file-system";
-import * as Sharing from "expo-sharing";
+
 import * as DocumentPicker from "expo-document-picker";
 import { StyleSheet, Text, View, FlatList, TouchableOpacity, Linking, TextInput, Alert, Platform, Share } from 'react-native';
 import * as Location from 'expo-location';
@@ -151,7 +151,7 @@ const addLocation = async () => {
         return;
       }
 
-      coords = await new Promise((resolve, reject) => {
+      coords = await new Promise((resolve) => {
 
         navigator.geolocation.getCurrentPosition(
           (position) => resolve(position.coords),
@@ -159,7 +159,6 @@ const addLocation = async () => {
           (error) => {
             console.log("Error GPS:", error);
 
-            // fallback si falla GPS
             resolve({
               latitude: 40.4168,
               longitude: -3.7038
@@ -212,29 +211,51 @@ const addLocation = async () => {
 
   if (appMode === "firebase") {
 
-  if (editingId) {
+    if (editingId) {
 
-    // actualizar ubicación existente
-    await updateDoc(
-      doc(db, "locations", editingId),
-      newLocation
-    );
+      await updateDoc(
+        doc(db, "locations", editingId),
+        newLocation
+      );
+
+    } else {
+
+      await addDoc(collection(db, "locations"), newLocation);
+
+    }
 
   } else {
 
-    // crear nueva ubicación
-    await addDoc(collection(db, "locations"), newLocation);
+    if (editingId) {
 
-  }
+      const stored = await AsyncStorage.getItem(LOCAL_STORAGE_KEY);
+      const local = stored ? JSON.parse(stored) : [];
 
-} else {
+      const updated = local.map(loc =>
+        loc.id === editingId ? { ...loc, ...newLocation } : loc
+      );
 
-    await saveLocationLocal(newLocation);
+      await AsyncStorage.setItem(
+        LOCAL_STORAGE_KEY,
+        JSON.stringify(updated)
+      );
 
-    setLocalCount(prev => prev + 1);
+      setLocations(updated);
 
-    const updated = [...locations, { id: Date.now().toString(), ...newLocation }];
-    setLocations(updated);
+    } else {
+
+      await saveLocationLocal(newLocation);
+
+      setLocalCount(prev => prev + 1);
+
+      const updated = [
+        ...locations,
+        { id: Date.now().toString(), ...newLocation }
+      ];
+
+      setLocations(updated);
+
+    }
 
   }
 
@@ -840,12 +861,7 @@ modeText: {
   fontSize: 12,
   fontWeight: "bold"
 },
-settingsButton: {
-  position: "absolute",
-  top: 5,
-  right: 5,
-  zIndex: 10
-},
+
 
 settingsButton: {
   position: "absolute",
