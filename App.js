@@ -229,14 +229,40 @@ const addLocation = async () => {
 
 } else {
 
+  if (editingId) {
+
+    const stored = await AsyncStorage.getItem(LOCAL_STORAGE_KEY);
+    const local = stored ? JSON.parse(stored) : [];
+
+    const updated = local.map(loc =>
+      loc.id === editingId
+        ? { ...loc, ...newLocation }
+        : loc
+    );
+
+    await AsyncStorage.setItem(
+      LOCAL_STORAGE_KEY,
+      JSON.stringify(updated)
+    );
+
+    setLocations(updated);
+
+  } else {
+
     await saveLocationLocal(newLocation);
 
     setLocalCount(prev => prev + 1);
 
-    const updated = [...locations, { id: Date.now().toString(), ...newLocation }];
+    const updated = [
+      ...locations,
+      { id: Date.now().toString(), ...newLocation }
+    ];
+
     setLocations(updated);
 
   }
+
+}
 
   setDescription("");
   setEditingId(null);
