@@ -1,5 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import * as FileSystem from "expo-file-system";
+import * as Sharing from "expo-sharing";
 
 import * as DocumentPicker from "expo-document-picker";
 import { StyleSheet, Text, View, FlatList, TouchableOpacity, Linking, TextInput, Alert, Platform, Share } from 'react-native';
