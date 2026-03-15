@@ -137,7 +137,7 @@ const shareLocation = async (location) => {
 };
 
 
-//
+//,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 const addLocation = async () => {
 
   let coords;
@@ -150,68 +150,35 @@ const addLocation = async () => {
         alert("Geolocalización no disponible en este dispositivo");
         return;
       }
-coords = await new Promise((resolve) => {
-      let resolved = false;
 
-const watchId = navigator.geolocation.watchPosition(
+      coords = await new Promise((resolve) => {
 
-  (position) => {
+        navigator.geolocation.getCurrentPosition(
 
-    const accuracy = position.coords.accuracy;
+          (position) => {
+            resolve(position.coords);
+          },
 
-// aceptar primera posición válida (iOS PWA fix)
-if (!resolved && position.coords.latitude && position.coords.longitude) {
+          (error) => {
 
-      resolved = true;
+            console.log("GPS error:", error);
 
-      navigator.geolocation.clearWatch(watchId);
+            resolve({
+              latitude: 40.4168,
+              longitude: -3.7038
+            });
 
-      resolve(position.coords);
-    }
+          },
 
-  },
+          {
+            enableHighAccuracy: true,
+            maximumAge: 0,
+            timeout: 20000
+          }
 
-  (error) => {
+        );
 
-    console.log("GPS error:", error);
-
-    if (!resolved) {
-      resolved = true;
-
-      navigator.geolocation.clearWatch(watchId);
-
-      resolve({
-        latitude: 40.4168,
-        longitude: -3.7038
       });
-    }
-
-  },
-
-  {
-    enableHighAccuracy: true,
-    maximumAge: 0,
-    timeout: 20000
-  }
-
-);
-
-// seguridad extra por si tarda demasiado
-setTimeout(() => {
-
-  if (!resolved) {
-
-    navigator.geolocation.clearWatch(watchId);
-
-    resolve({
-      latitude: 40.4168,
-      longitude: -3.7038
-    });
-
-  }
-
-}, 20000);
-});
 
     } else {
 
@@ -240,7 +207,7 @@ setTimeout(() => {
     };
 
   }
-
+//,,,,,,,,,,,,,,,,,,,,,,,,,,
   const newLocation = {
     description: description || "Ubicación",
     latitude: coords.latitude,
