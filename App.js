@@ -421,16 +421,20 @@ const exportLocations = () => {
   if (Platform.OS === "web") {
 
    const blob = new Blob([json], { type: "application/json" });
+//------------------------------------------------
+const filename = "ubicapin_locations.json";
 
-const url = URL.createObjectURL(blob);
+const dataStr =
+  "data:text/json;charset=utf-8," +
+  encodeURIComponent(JSON.stringify(locations, null, 2));
 
-// abrir archivo en nueva pestaña (Safari iOS compatible)
-window.open(url, "_blank");
+const link = document.createElement("a");
+link.setAttribute("href", dataStr);
+link.setAttribute("download", filename);
 
-// liberar memoria después
-setTimeout(() => {
-  URL.revokeObjectURL(url);
-}, 10000);
+document.body.appendChild(link);
+link.click();
+document.body.removeChild(link);
 
   } else {
 
