@@ -150,34 +150,63 @@ const addLocation = async () => {
         alert("Geolocalización no disponible en este dispositivo");
         return;
       }
-// FORZAR PERMISO EN iOS PWA
-if (navigator.geolocation) {
-  navigator.geolocation.getCurrentPosition(
-    () => {},
-    () => {}
-  );
-}
+
       coords = await new Promise((resolve, reject) => {
 
-        navigator.geolocation.getCurrentPosition(
-          (position) => resolve(position.coords),
+      const isPWA =
+  window.navigator.standalone === true ||
+  window.matchMedia("(display-mode: standalone)").matches;
 
-          (error) => {
-            console.log("Error GPS:", error);
+if (isPWA) {
 
-            // fallback si falla GPS
-            resolve({
-              latitude: 40.4168,
-              longitude: -3.7038
-            });
-          },
+  const watchId = navigator.geolocation.watchPosition(
 
-          {
-            enableHighAccuracy: true,
-            timeout: 15000,
-            maximumAge: 0
-          }
-        );
+    (position) => {
+      navigator.geolocation.clearWatch(watchId);
+      resolve(position.coords);
+    },
+
+    (error) => {
+      console.log("GPS error:", error);
+
+      resolve({
+        latitude: 40.4168,
+        longitude: -3.7038
+      });
+    },
+
+    {
+      enableHighAccuracy: true,
+      maximumAge: 0,
+      timeout: 15000
+    }
+
+  );
+
+} else {
+
+  navigator.geolocation.getCurrentPosition(
+
+    (position) => resolve(position.coords),
+
+    (error) => {
+      console.log("Error GPS:", error);
+
+      resolve({
+        latitude: 40.4168,
+        longitude: -3.7038
+      });
+    },
+
+    {
+      enableHighAccuracy: true,
+      maximumAge: 0,
+      timeout: 15000
+    }
+
+  );
+
+}
 
       });
 
