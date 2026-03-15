@@ -145,37 +145,21 @@ const addLocation = async () => {
   try {
 
     if (Platform.OS === "web") {
-
-      if (!navigator.geolocation) {
-        alert("Geolocalización no disponible en este dispositivo");
-        return;
-      }
-
-      coords = await new Promise((resolve, reject) => {
-
-        navigator.geolocation.getCurrentPosition(
-          (position) => resolve(position.coords),
-
-          (error) => {
-            console.log("Error GPS:", error);
-
-            // fallback si falla GPS
-            resolve({
-              latitude: 40.4168,
-              longitude: -3.7038
-            });
-          },
-
-          {
-            enableHighAccuracy: true,
-            timeout: 15000,
-            maximumAge: 5000
-          }
-        );
-
-      });
-
-    } else {
+    coords = await new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(
+        (position) => resolve(position.coords),
+        (error) => {
+          console.error("Error GPS:", error);
+          reject(error);
+        },
+        {
+          enableHighAccuracy: true, // Fuerza el uso de GPS real
+          timeout: 15000,           // Tiempo de espera para el sensor
+          maximumAge: 0             // PROHÍBE el uso de ubicación guardada en caché
+        }
+      );
+    });
+  } else {
 
       const { status } = await Location.requestForegroundPermissionsAsync();
 
