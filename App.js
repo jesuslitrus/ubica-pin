@@ -159,8 +159,8 @@ const watchId = navigator.geolocation.watchPosition(
 
     const accuracy = position.coords.accuracy;
 
-    // esperar a que la precisión sea buena
-    if (!resolved && accuracy && accuracy < 50) {
+// aceptar primera posición válida (iOS PWA fix)
+if (!resolved && position.coords.latitude && position.coords.longitude) {
 
       resolved = true;
 
