@@ -145,12 +145,27 @@ const addLocation = async () => {
   try {
 
     if (Platform.OS === "web") {
+//entre esto
+    try {
 
-      if (!navigator.geolocation) {
-        alert("Geolocalización no disponible en este dispositivo");
-        return;
-      }
+  if (navigator.permissions && navigator.permissions.query) {
 
+    const permission = await navigator.permissions.query({
+      name: "geolocation"
+    });
+
+    if (permission.state === "denied") {
+      alert("La ubicación está bloqueada para esta app.");
+      return;
+    }
+
+  }
+
+} catch (err) {
+  console.log("Permissions API no disponible");
+}
+
+      //
       coords = await new Promise((resolve, reject) => {
 
         navigator.geolocation.getCurrentPosition(
