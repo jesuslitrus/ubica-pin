@@ -1,4 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
+import * as FileSystem from "expo-file-system";
+import * as Sharing from "expo-sharing";
+import * as DocumentPicker from "expo-document-picker";
 import { StyleSheet, Text, View, FlatList, TouchableOpacity, Linking, TextInput, Alert, Platform, Share } from 'react-native';
 import * as Location from 'expo-location';
 
@@ -6,6 +9,10 @@ import { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { db } from "./firebase";
 import { collection, addDoc, deleteDoc, updateDoc, doc, onSnapshot } from "firebase/firestore";
+import SettingsMenu from "./components/SettingsMenu";
+
+const LOCAL_STORAGE_KEY = "ubicapin_locations";
+
 let MapView = null;
 let Marker = null;
 
@@ -18,13 +25,17 @@ if (Platform.OS !== "web") {
 export default function App() {
 
   const [locations, setLocations] = useState([]);
+  const [appMode, setAppMode] = useState("firebase");
   const [description, setDescription] = useState("");
   const [editingId, setEditingId] = useState(null);
  
   const [showMap, setShowMap] = useState(false);
-
+  const [localCount, setLocalCount] = useState(0);
+  const [showMenu, setShowMenu] = useState(false);
 
 useEffect(() => {
+
+  if (appMode !== "firebase") return;
 
   const unsubscribe = onSnapshot(collection(db, "locations"), (snapshot) => {
 
@@ -39,14 +50,74 @@ useEffect(() => {
 
   return unsubscribe;
 
-}, []);
+}, [appMode]); 
 
+
+const saveLocationLocal = async (location) => {
+
+  const stored = await AsyncStorage.getItem(LOCAL_STORAGE_KEY);
+
+  let locationsLocal = stored ? JSON.parse(stored) : [];
+
+  locationsLocal.push({
+    id: Date.now().toString(),
+    ...location
+  });
+
+  await AsyncStorage.setItem(
+    LOCAL_STORAGE_KEY,
+    JSON.stringify(locationsLocal)
+  );
+
+};
 
 const openMaps = (lat, lng) => {
   const url = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
   Linking.openURL(url);
 };
 
+
+const loadLocalLocations = async () => {
+
+  const stored = await AsyncStorage.getItem(LOCAL_STORAGE_KEY);
+
+  if (stored) {
+
+    const data = JSON.parse(stored);
+
+    setLocations(data);
+    setLocalCount(data.length);
+
+  } else {
+
+    setLocalCount(0);
+
+  }
+
+};
+
+const syncLocalToFirebase = async () => {
+
+  const stored = await AsyncStorage.getItem(LOCAL_STORAGE_KEY);
+
+  if (!stored) return;
+
+  const localLocations = JSON.parse(stored);
+
+  if (localLocations.length === 0) return;
+
+  for (const loc of localLocations) {
+
+    const { id, ...data } = loc;
+
+    await addDoc(collection(db, "locations"), data);
+
+  }
+
+  await AsyncStorage.removeItem(LOCAL_STORAGE_KEY);
+  setLocalCount(0);
+
+};
 const shareLocation = async (location) => {
 
   const url = `https://www.google.com/maps/search/?api=1&query=${location.latitude},${location.longitude}`;
@@ -71,17 +142,30 @@ const addLocation = async () => {
 
   if (Platform.OS === "web") {
 
-    coords = await new Promise((resolve, reject) => {
-      navigator.geolocation.getCurrentPosition(
-        (position) => resolve(position.coords),
-        (error) => reject(error),
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 0
-        }
-      );
-    });
+ coords = await new Promise((resolve) => {
+
+  if (!navigator.geolocation) {
+    alert("Geolocalización no disponible");
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    (position) => resolve(position.coords),
+    (error) => {
+      alert("No se pudo obtener la ubicación");
+      resolve({
+        latitude: 40.4168,
+        longitude: -3.7038
+      });
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 0
+    }
+  );
+
+});
 
   } else {
 
@@ -108,25 +192,60 @@ const addLocation = async () => {
 };
 
   let updatedLocations;
-//
-  if (editingId) {
+  //
+if (editingId) {
 
-  const ref = doc(db, "locations", editingId);
+  if (appMode === "firebase") {
 
-  await updateDoc(ref, {
-    description: description
-  });
+    const ref = doc(db, "locations", editingId);
+
+    await updateDoc(ref, {
+      description: description
+    });
+
+  } else {
+
+    const stored = await AsyncStorage.getItem(LOCAL_STORAGE_KEY);
+    const local = stored ? JSON.parse(stored) : [];
+
+    const updated = local.map(loc =>
+      loc.id === editingId
+        ? { ...loc, description: description }
+        : loc
+    );
+
+    await AsyncStorage.setItem(
+      LOCAL_STORAGE_KEY,
+      JSON.stringify(updated)
+    );
+
+    setLocations(updated);
+
+  }
 
   setEditingId(null);
+  setDescription("");
 
 } else {
 
-  await addDoc(collection(db, "locations"), newLocation);
+  if (appMode === "firebase") {
+
+    await addDoc(collection(db, "locations"), newLocation);
+
+  } else {
+
+    await saveLocationLocal(newLocation);
+
+    setLocalCount(prev => prev + 1);
+
+    const updated = [...locations, { id: Date.now().toString(), ...newLocation }];
+    setLocations(updated);
+
+  }
+setDescription("");
+setEditingId(null);
 
 }
-
-setDescription("");
-  setDescription("");
 };
 
 
@@ -134,20 +253,30 @@ setDescription("");
 
 
 
-  const deleteLocation = async (id) => {
+const deleteLocation = async (id) => {
+
+  if (appMode === "firebase") {
+
     await deleteDoc(doc(db, "locations", id));
 
-   const filteredLocations = locations.filter(
-  (location) => location.id !== id
-);
+  } else {
 
-setLocations(filteredLocations);
+    const stored = await AsyncStorage.getItem(LOCAL_STORAGE_KEY);
+const local = stored ? JSON.parse(stored) : [];
+
+const updated = local.filter(loc => loc.id !== id);
 
 await AsyncStorage.setItem(
-  "locations",
-  JSON.stringify(filteredLocations)
+  LOCAL_STORAGE_KEY,
+  JSON.stringify(updated)
 );
-  };
+
+setLocalCount(updated.length);
+setLocations(updated);
+
+  }
+
+};
 
 
   const editLocation = (location) => {
@@ -184,17 +313,225 @@ const confirmDelete = (id) => {
 };
 
 
+const toggleMode = async () => {
+
+  const newMode = appMode === "firebase" ? "local" : "firebase";
+
+  if (Platform.OS === "web") {
+
+    const confirmed = window.confirm(
+      `¿Seguro que quieres cambiar a modo ${newMode}?`
+    );
+
+    if (confirmed) {
+      if (newMode === "firebase") {
+
+  const stored = await AsyncStorage.getItem(LOCAL_STORAGE_KEY);
+
+  if (stored) {
+
+    const localLocations = JSON.parse(stored);
+
+    if (localLocations.length > 0) {
+
+      if (Platform.OS === "web") {
+
+        const confirmed = window.confirm(
+          `Hay ${localLocations.length} ubicaciones locales. ¿Sincronizarlas con Firebase?`
+        );
+
+        if (confirmed) {
+          await syncLocalToFirebase();
+        }
+
+      } else {
+
+        Alert.alert(
+          "Sincronizar ubicaciones",
+          `Hay ${localLocations.length} ubicaciones locales. ¿Deseas sincronizarlas con Firebase?`,
+          [
+            { text: "Cancelar", style: "cancel" },
+            {
+              text: "Sincronizar",
+              onPress: async () => {
+                await syncLocalToFirebase();
+              }
+            }
+          ]
+        );
+
+      }
+
+    }
+
+  }
+
+}
+
+setAppMode(newMode);
+setEditingId(null);
+setDescription("");
+
+if (newMode === "firebase") {
+
+  // recargar datos de Firebase
+  setLocations([]);
+
+}
+
+if (newMode === "local") {
+
+  setLocations([]);
+  loadLocalLocations();
+
+}
+
+
+    }
+
+  } else {
+
+    Alert.alert(
+      "Cambiar modo",
+      `¿Seguro que quieres cambiar a modo ${newMode}?`,
+      [
+        { text: "Cancelar", style: "cancel" },
+        { text: "Sí", onPress: () => setAppMode(newMode) }
+      ]
+    );
+
+  }
+
+};
 
 
 
 
 
-  
+//
+const exportLocations = () => {
 
-  return (
-    <View style={styles.container}>
+  if (!locations || locations.length === 0) {
+    alert("No hay ubicaciones para exportar");
+    return;
+  }
+
+  const json = JSON.stringify(locations, null, 2);
+
+  if (Platform.OS === "web") {
+
+    const blob = new Blob([json], { type: "application/json" });
+
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "ubicapin_locations.json";
+
+    document.body.appendChild(link);
+    link.click();
+
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+  } else {
+
+    Share.share({
+      message: json,
+      title: "Ubica-Pin locations"
+    });
+
+  }
+
+};
+
+const importLocations = async () => {
+
+  try {
+
+    const result = await DocumentPicker.getDocumentAsync({
+      type: "application/json"
+    });
+
+    if (result.canceled) return;
+
+    const fileUri = result.assets[0].uri;
+
+    const content = await FileSystem.readAsStringAsync(fileUri);
+
+    const importedLocations = JSON.parse(content);
+
+    if (!Array.isArray(importedLocations)) {
+
+      alert("Archivo inválido");
+      return;
+
+    }
+
+    if (appMode === "firebase") {
+
+      for (const loc of importedLocations) {
+
+        const { id, ...data } = loc;
+
+        await addDoc(collection(db, "locations"), data);
+
+      }
+
+    } else {
+
+      const stored = await AsyncStorage.getItem(LOCAL_STORAGE_KEY);
+
+      const local = stored ? JSON.parse(stored) : [];
+
+      const merged = [...local, ...importedLocations];
+
+      await AsyncStorage.setItem(
+        LOCAL_STORAGE_KEY,
+        JSON.stringify(merged)
+      );
+
+      setLocations(merged);
+      setLocalCount(merged.length);
+
+    }
+
+  } catch (error) {
+
+    console.log("Error importando:", error);
+
+  }
+
+};
+
+return (
+  <View style={styles.container}>
+
+    <TouchableOpacity
+      style={styles.settingsButton}
+      onPress={() => setShowMenu(!showMenu)}
+    >
+      <Text style={{fontSize:22}}>⚙️</Text>
+    </TouchableOpacity>
+
+    <View style={styles.headerRow}>
 
       <Text style={styles.title}>📍 Ubica-Pin</Text>
+
+      <TouchableOpacity
+        style={styles.modeBadge}
+        onPress={toggleMode}
+      >
+    
+    <Text style={styles.modeText}>
+  {appMode === "firebase"
+    ? "☁ Sync"
+    : `💾 Local${localCount > 0 ? ` (${localCount})` : ""}`}
+</Text>
+  </TouchableOpacity>
+
+</View>
+
 
       <TextInput
         style={styles.input}
@@ -319,6 +656,12 @@ const confirmDelete = (id) => {
         )}
       />
 
+<SettingsMenu
+  visible={showMenu}
+  onClose={() => setShowMenu(false)}
+  onExport={exportLocations}
+  onImport={importLocations}
+/>
       <StatusBar style="auto" />
     </View>
   );
@@ -482,5 +825,44 @@ topButtonRow: {
   justifyContent: "space-between",
   marginBottom: 20
 },
+
+headerRow: {
+  flexDirection: "row",
+  justifyContent: "space-between",
+  alignItems: "center",
+  marginBottom: 20
+},
+
+modeBadge: {
+  backgroundColor: "#007AFF",
+  paddingHorizontal: 10,
+  paddingVertical: 4,
+  borderRadius: 12
+},
+
+modeText: {
+  color: "white",
+  fontSize: 12,
+  fontWeight: "bold"
+},
+settingsButton: {
+  position: "absolute",
+  top: 5,
+  right: 5,
+  zIndex: 10
+},
+
+settingsButton: {
+  position: "absolute",
+  top: 10,
+  right: 15,
+  zIndex: 20
+},
+
+
+
+
+
+
 
 });
