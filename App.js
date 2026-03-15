@@ -150,7 +150,7 @@ const addLocation = async () => {
         alert("Geolocalización no disponible en este dispositivo");
         return;
       }
-
+//
       coords = await new Promise((resolve, reject) => {
 
       const isPWA =
