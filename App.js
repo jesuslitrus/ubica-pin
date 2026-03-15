@@ -145,27 +145,12 @@ const addLocation = async () => {
   try {
 
     if (Platform.OS === "web") {
-//entre esto
-    try {
 
-  if (navigator.permissions && navigator.permissions.query) {
+      if (!navigator.geolocation) {
+        alert("Geolocalización no disponible en este dispositivo");
+        return;
+      }
 
-    const permission = await navigator.permissions.query({
-      name: "geolocation"
-    });
-
-    if (permission.state === "denied") {
-      alert("La ubicación está bloqueada para esta app.");
-      return;
-    }
-
-  }
-
-} catch (err) {
-  console.log("Permissions API no disponible");
-}
-
-      //
       coords = await new Promise((resolve, reject) => {
 
         navigator.geolocation.getCurrentPosition(
@@ -227,40 +212,7 @@ const addLocation = async () => {
 
   if (appMode === "firebase") {
 
-  if (editingId) {
-
-    // actualizar ubicación existente
-    await updateDoc(
-      doc(db, "locations", editingId),
-      newLocation
-    );
-
-  } else {
-
-    // crear nueva ubicación
     await addDoc(collection(db, "locations"), newLocation);
-
-  }
-
-} else {
-
-  if (editingId) {
-
-    const stored = await AsyncStorage.getItem(LOCAL_STORAGE_KEY);
-    const local = stored ? JSON.parse(stored) : [];
-
-    const updated = local.map(loc =>
-      loc.id === editingId
-        ? { ...loc, ...newLocation }
-        : loc
-    );
-
-    await AsyncStorage.setItem(
-      LOCAL_STORAGE_KEY,
-      JSON.stringify(updated)
-    );
-
-    setLocations(updated);
 
   } else {
 
@@ -268,16 +220,10 @@ const addLocation = async () => {
 
     setLocalCount(prev => prev + 1);
 
-    const updated = [
-      ...locations,
-      { id: Date.now().toString(), ...newLocation }
-    ];
-
+    const updated = [...locations, { id: Date.now().toString(), ...newLocation }];
     setLocations(updated);
 
   }
-
-}
 
   setDescription("");
   setEditingId(null);
@@ -462,20 +408,7 @@ const exportLocations = () => {
 
     const link = document.createElement("a");
     link.href = url;
-    const now = new Date();
-
-const date =
-  now.getFullYear() + "-" +
-  String(now.getMonth() + 1).padStart(2, "0") + "-" +
-  String(now.getDate()).padStart(2, "0");
-
-const time =
-  String(now.getHours()).padStart(2, "0") + "-" +
-  String(now.getMinutes()).padStart(2, "0");
-
-const filename = `ubicapin_${date}_${time}.json`;
-
-link.download = filename;
+    link.download = "ubicapin_locations.json";
 
     document.body.appendChild(link);
     link.click();
