@@ -175,7 +175,7 @@ if (navigator.geolocation) {
           {
             enableHighAccuracy: true,
             timeout: 15000,
-            maximumAge: 5000
+            maximumAge: 0
           }
         );
 
