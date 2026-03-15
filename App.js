@@ -422,7 +422,8 @@ const exportLocations = () => {
 
    const blob = new Blob([json], { type: "application/json" });
 //------------------------------------------------
-const filename = "ubicapin_locations.json";
+const prefix = appMode === "firebase" ? "S_" : "L_";
+const filename = `${prefix}ubicapin_locations.json`;
 
 const dataStr =
   "data:text/json;charset=utf-8," +
