@@ -77,6 +77,8 @@ const openMaps = (lat, lng) => {
 };
 
 
+
+
 const loadLocalLocations = async () => {
 
   const stored = await AsyncStorage.getItem(LOCAL_STORAGE_KEY);
@@ -135,98 +137,78 @@ const shareLocation = async (location) => {
 };
 
 
-
+//
 const addLocation = async () => {
 
   let coords;
 
-  if (Platform.OS === "web") {
+  try {
 
- coords = await new Promise((resolve) => {
+    if (Platform.OS === "web") {
 
-  if (!navigator.geolocation) {
-    alert("Geolocalización no disponible");
-    return;
-  }
+      if (!navigator.geolocation) {
+        alert("Geolocalización no disponible en este dispositivo");
+        return;
+      }
 
-  navigator.geolocation.getCurrentPosition(
-    (position) => resolve(position.coords),
-    (error) => {
-      alert("No se pudo obtener la ubicación");
-      resolve({
-        latitude: 40.4168,
-        longitude: -3.7038
+      coords = await new Promise((resolve, reject) => {
+
+        navigator.geolocation.getCurrentPosition(
+          (position) => resolve(position.coords),
+
+          (error) => {
+            console.log("Error GPS:", error);
+
+            // fallback si falla GPS
+            resolve({
+              latitude: 40.4168,
+              longitude: -3.7038
+            });
+          },
+
+          {
+            enableHighAccuracy: true,
+            timeout: 15000,
+            maximumAge: 5000
+          }
+        );
+
       });
-    },
-    {
-      enableHighAccuracy: true,
-      timeout: 10000,
-      maximumAge: 0
+
+    } else {
+
+      const { status } = await Location.requestForegroundPermissionsAsync();
+
+      if (status !== "granted") {
+        alert("Permiso de ubicación denegado");
+        return;
+      }
+
+      const location = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.High
+      });
+
+      coords = location.coords;
+
     }
-  );
 
-});
+  } catch (err) {
 
-  } else {
+    console.log("GPS fallo:", err);
 
-    const { status } = await Location.requestForegroundPermissionsAsync();
-
-    if (status !== "granted") {
-      alert("Permiso de ubicación denegado");
-      return;
-    }
-
-    const location = await Location.getCurrentPositionAsync({
-      accuracy: Location.Accuracy.High
-    });
-
-    coords = location.coords;
+    coords = {
+      latitude: 40.4168,
+      longitude: -3.7038
+    };
 
   }
 
   const newLocation = {
-  description: description || "Ubicación",
-  latitude: coords.latitude,
-  longitude: coords.longitude,
-  date: new Date().toLocaleDateString()
-};
-
-  let updatedLocations;
-  //
-if (editingId) {
-
-  if (appMode === "firebase") {
-
-    const ref = doc(db, "locations", editingId);
-
-    await updateDoc(ref, {
-      description: description
-    });
-
-  } else {
-
-    const stored = await AsyncStorage.getItem(LOCAL_STORAGE_KEY);
-    const local = stored ? JSON.parse(stored) : [];
-
-    const updated = local.map(loc =>
-      loc.id === editingId
-        ? { ...loc, description: description }
-        : loc
-    );
-
-    await AsyncStorage.setItem(
-      LOCAL_STORAGE_KEY,
-      JSON.stringify(updated)
-    );
-
-    setLocations(updated);
-
-  }
-
-  setEditingId(null);
-  setDescription("");
-
-} else {
+    description: description || "Ubicación",
+    latitude: coords.latitude,
+    longitude: coords.longitude,
+    date: new Date().toLocaleDateString()
+  };
 
   if (appMode === "firebase") {
 
@@ -242,12 +224,12 @@ if (editingId) {
     setLocations(updated);
 
   }
-setDescription("");
-setEditingId(null);
 
-}
+  setDescription("");
+  setEditingId(null);
+
 };
-
+//
 
   
 
