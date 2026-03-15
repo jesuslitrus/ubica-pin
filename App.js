@@ -420,19 +420,17 @@ const exportLocations = () => {
 
   if (Platform.OS === "web") {
 
-    const blob = new Blob([json], { type: "application/json" });
+   const blob = new Blob([json], { type: "application/json" });
 
-    const url = URL.createObjectURL(blob);
+const url = URL.createObjectURL(blob);
 
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "ubicapin_locations.json";
+// abrir archivo en nueva pestaña (Safari iOS compatible)
+window.open(url, "_blank");
 
-    document.body.appendChild(link);
-    link.click();
-
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+// liberar memoria después
+setTimeout(() => {
+  URL.revokeObjectURL(url);
+}, 10000);
 
   } else {
 
