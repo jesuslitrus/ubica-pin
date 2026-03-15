@@ -150,58 +150,67 @@ const addLocation = async () => {
         alert("Geolocalización no disponible en este dispositivo");
         return;
       }
-//
-      coords = await new Promise((resolve, reject) => {
+//--------------------
+      let resolved = false;
 
-        let resolved = false;
+const watchId = navigator.geolocation.watchPosition(
 
-const success = (position) => {
-  if (!resolved) {
-    resolved = true;
-    resolve(position.coords);
+  (position) => {
+
+    const accuracy = position.coords.accuracy;
+
+    // esperar a que la precisión sea buena
+    if (!resolved && accuracy && accuracy < 50) {
+
+      resolved = true;
+
+      navigator.geolocation.clearWatch(watchId);
+
+      resolve(position.coords);
+    }
+
+  },
+
+  (error) => {
+
+    console.log("GPS error:", error);
+
+    if (!resolved) {
+      resolved = true;
+
+      navigator.geolocation.clearWatch(watchId);
+
+      resolve({
+        latitude: 40.4168,
+        longitude: -3.7038
+      });
+    }
+
+  },
+
+  {
+    enableHighAccuracy: true,
+    maximumAge: 0,
+    timeout: 20000
   }
-};
 
-const error = (err) => {
-  console.log("GPS error:", err);
+);
+
+// seguridad extra por si tarda demasiado
+setTimeout(() => {
 
   if (!resolved) {
-    resolved = true;
+
+    navigator.geolocation.clearWatch(watchId);
+
     resolve({
       latitude: 40.4168,
       longitude: -3.7038
     });
+
   }
-};
 
-// iOS PWA fix: usar watchPosition primero
-const watchId = navigator.geolocation.watchPosition(
-  success,
-  error,
-  {
-    enableHighAccuracy: true,
-    maximumAge: 0,
-    timeout: 20000
-  }
-);
-
-// respaldo con getCurrentPosition
-navigator.geolocation.getCurrentPosition(
-  success,
-  error,
-  {
-    enableHighAccuracy: true,
-    maximumAge: 0,
-    timeout: 20000
-  }
-);
-
-// limpiar watch después de 10s
-setTimeout(() => {
-  navigator.geolocation.clearWatch(watchId);
-}, 10000);
-
-      });
+}, 20000);
 
     } else {
 
