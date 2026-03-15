@@ -150,7 +150,7 @@ const addLocation = async () => {
         alert("Geolocalización no disponible en este dispositivo");
         return;
       }
-//--------------------
+coords = await new Promise((resolve) => {
       let resolved = false;
 
 const watchId = navigator.geolocation.watchPosition(
@@ -211,6 +211,7 @@ setTimeout(() => {
   }
 
 }, 20000);
+});
 
     } else {
 
