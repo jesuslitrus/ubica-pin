@@ -150,63 +150,28 @@ const addLocation = async () => {
         alert("Geolocalización no disponible en este dispositivo");
         return;
       }
-//
+
       coords = await new Promise((resolve, reject) => {
 
-      const isPWA =
-  window.navigator.standalone === true ||
-  window.matchMedia("(display-mode: standalone)").matches;
+        navigator.geolocation.getCurrentPosition(
+          (position) => resolve(position.coords),
 
-if (isPWA) {
+          (error) => {
+            console.log("Error GPS:", error);
 
-  const watchId = navigator.geolocation.watchPosition(
+            // fallback si falla GPS
+            resolve({
+              latitude: 40.4168,
+              longitude: -3.7038
+            });
+          },
 
-    (position) => {
-      navigator.geolocation.clearWatch(watchId);
-      resolve(position.coords);
-    },
-
-    (error) => {
-      console.log("GPS error:", error);
-
-      resolve({
-        latitude: 40.4168,
-        longitude: -3.7038
-      });
-    },
-
-    {
-      enableHighAccuracy: true,
-      maximumAge: 0,
-      timeout: 15000
-    }
-
-  );
-
-} else {
-
-  navigator.geolocation.getCurrentPosition(
-
-    (position) => resolve(position.coords),
-
-    (error) => {
-      console.log("Error GPS:", error);
-
-      resolve({
-        latitude: 40.4168,
-        longitude: -3.7038
-      });
-    },
-
-    {
-      enableHighAccuracy: true,
-      maximumAge: 0,
-      timeout: 15000
-    }
-
-  );
-
-}
+          {
+            enableHighAccuracy: true,
+            timeout: 15000,
+            maximumAge: 5000
+          }
+        );
 
       });
 
@@ -247,40 +212,7 @@ if (isPWA) {
 
   if (appMode === "firebase") {
 
-  if (editingId) {
-
-    // actualizar ubicación existente
-    await updateDoc(
-      doc(db, "locations", editingId),
-      newLocation
-    );
-
-  } else {
-
-    // crear nueva ubicación
     await addDoc(collection(db, "locations"), newLocation);
-
-  }
-
-} else {
-
-  if (editingId) {
-
-    const stored = await AsyncStorage.getItem(LOCAL_STORAGE_KEY);
-    const local = stored ? JSON.parse(stored) : [];
-
-    const updated = local.map(loc =>
-      loc.id === editingId
-        ? { ...loc, ...newLocation }
-        : loc
-    );
-
-    await AsyncStorage.setItem(
-      LOCAL_STORAGE_KEY,
-      JSON.stringify(updated)
-    );
-
-    setLocations(updated);
 
   } else {
 
@@ -288,16 +220,10 @@ if (isPWA) {
 
     setLocalCount(prev => prev + 1);
 
-    const updated = [
-      ...locations,
-      { id: Date.now().toString(), ...newLocation }
-    ];
-
+    const updated = [...locations, { id: Date.now().toString(), ...newLocation }];
     setLocations(updated);
 
   }
-
-}
 
   setDescription("");
   setEditingId(null);
@@ -482,20 +408,7 @@ const exportLocations = () => {
 
     const link = document.createElement("a");
     link.href = url;
-    const now = new Date();
-
-const date =
-  now.getFullYear() + "-" +
-  String(now.getMonth() + 1).padStart(2, "0") + "-" +
-  String(now.getDate()).padStart(2, "0");
-
-const time =
-  String(now.getHours()).padStart(2, "0") + "-" +
-  String(now.getMinutes()).padStart(2, "0");
-
-const filename = `ubicapin_${date}_${time}.json`;
-
-link.download = filename;
+    link.download = "ubicapin_locations.json";
 
     document.body.appendChild(link);
     link.click();
