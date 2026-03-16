@@ -149,6 +149,9 @@ const addLocation = async () => {
     return;
   }
 
+
+  
+
   navigator.geolocation.getCurrentPosition(
     (position) => resolve(position.coords),
     (error) => {
@@ -473,15 +476,24 @@ const importLocations = async () => {
 
     if (appMode === "firebase") {
 
-      for (const loc of importedLocations) {
+  const added = [];
 
-        const { id, ...data } = loc;
+  for (const loc of importedLocations) {
 
-        await addDoc(collection(db, "locations"), data);
+    const { id, ...data } = loc;
 
-      }
+    const docRef = await addDoc(collection(db, "locations"), data);
 
-    } else {
+    added.push({
+      id: docRef.id,
+      ...data
+    });
+
+  }
+
+  setLocations(prev => [...prev, ...added]);
+
+} else {
 
       const stored = await AsyncStorage.getItem(LOCAL_STORAGE_KEY);
 
