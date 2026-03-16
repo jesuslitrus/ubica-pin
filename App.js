@@ -463,7 +463,18 @@ const importLocations = async () => {
 
     const fileUri = result.assets[0].uri;
 
-    const content = await FileSystem.readAsStringAsync(fileUri);
+    let content;
+
+if (Platform.OS === "web") {
+
+  const response = await fetch(fileUri);
+  content = await response.text();
+
+} else {
+
+  content = await FileSystem.readAsStringAsync(fileUri);
+
+}
 
     const importedLocations = JSON.parse(content);
 
@@ -476,24 +487,15 @@ const importLocations = async () => {
 
     if (appMode === "firebase") {
 
-  const added = [];
+      for (const loc of importedLocations) {
 
-  for (const loc of importedLocations) {
+        const { id, ...data } = loc;
 
-    const { id, ...data } = loc;
+        await addDoc(collection(db, "locations"), data);
 
-    const docRef = await addDoc(collection(db, "locations"), data);
+      }
 
-    added.push({
-      id: docRef.id,
-      ...data
-    });
-
-  }
-
-  setLocations(prev => [...prev, ...added]);
-
-} else {
+    } else {
 
       const stored = await AsyncStorage.getItem(LOCAL_STORAGE_KEY);
 
