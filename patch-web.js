@@ -31,6 +31,13 @@ fs.copyFileSync("assets/logo_512.png", "docs/assets/logo_512.png");
 let docHtml = fs.readFileSync("docs/index.html", "utf8");
 
 const snippet = `
+
+<link rel="apple-touch-icon" href="assets/logo_192.png">
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Ubica-Pin">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+
 <link rel="apple-touch-icon" href="assets/logo_192.png">
 <meta name="theme-color" content="#ffffff">
 `;
