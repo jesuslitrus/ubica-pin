@@ -10,6 +10,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { db } from "./firebase";
 import { collection, addDoc, deleteDoc, updateDoc, doc, onSnapshot } from "firebase/firestore";
 import SettingsMenu from "./components/SettingsMenu";
+import AuthGate from "./components/AuthGate";
 
 const LOCAL_STORAGE_KEY = "ubicapin_locations";
 
@@ -522,6 +523,7 @@ if (Platform.OS === "web") {
 };
 
 return (
+  <AuthGate>
   <View style={styles.container}>
 
     <TouchableOpacity
@@ -681,6 +683,7 @@ return (
 />
       <StatusBar style="auto" />
     </View>
+    </AuthGate>
   );
 }
 
