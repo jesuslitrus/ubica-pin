@@ -11,11 +11,7 @@ import {
   signOut
 } from "firebase/auth";
 
-const unsubscribe = onAuthStateChanged(auth, (u) => {
-  console.log("USER:", u);
-  setUser(u);
-  setLoading(false); // 👈 AÑADE ESTO
-});
+
 
 const auth = getAuth();
 const provider = new GoogleAuthProvider();
