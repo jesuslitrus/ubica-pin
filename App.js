@@ -523,7 +523,7 @@ if (Platform.OS === "web") {
 };
 
 return (
-  <AuthGate>
+  <children>
   <View style={styles.container}>
 
     <TouchableOpacity
@@ -683,7 +683,7 @@ return (
 />
       <StatusBar style="auto" />
     </View>
-    </AuthGate>
+    </children>
   );
 }
 
