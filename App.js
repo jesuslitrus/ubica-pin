@@ -41,6 +41,44 @@ useEffect(() => {
     
     if (appMode !== "firebase") {
       loadLocations(); // Carga local si no es firebase
+
+      // --- INICIO DEL BLOQUE REQUERIDO ---
+  const renderLocation = ({ item }) => (
+    <View style={styles.locationItem}>
+      <Text style={styles.locationDescription}>{item.description}</Text>
+      <Text style={styles.locationDate}>{item.date}</Text>
+      <View style={styles.buttonRow}>
+        <TouchableOpacity 
+          style={styles.smallButton} 
+          onPress={() => openMaps(item.latitude, item.longitude)}
+        >
+          <Text style={styles.buttonText}>Mapa</Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          style={styles.smallEditButton} 
+          onPress={() => {
+            setEditingId(item.id);
+            setDescription(item.description);
+          }}
+        >
+          <Text style={styles.buttonText}>Editar</Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          style={styles.smallDeleteButton} 
+          onPress={() => deleteLocation(item.id)}
+        >
+          <Text style={styles.buttonText}>Borrar</Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          style={styles.smallShareButton} 
+          onPress={() => shareLocation(item)}
+        >
+          <Text style={styles.buttonText}>Compartir</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+  // --- FIN DEL BLOQUE REQUERIDO ---
       return;
     }
 
