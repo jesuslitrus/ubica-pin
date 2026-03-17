@@ -14,6 +14,7 @@ import {
 
 
 const auth = getAuth();
+setPersistence(auth, browserLocalPersistence);
 const provider = new GoogleAuthProvider();
 
 export default function AuthGate({ children }) {
