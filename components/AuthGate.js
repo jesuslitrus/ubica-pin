@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View, Button, Text } from "react-native";
 
 import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
+import { setPersistence, browserLocalPersistence } from "firebase/auth";
 
 const auth = getAuth();
 const provider = new GoogleAuthProvider();
@@ -10,18 +11,19 @@ export default function AuthGate({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (u) => {
-      setUser(u);
-      setLoading(false);
-    });
+ useEffect(() => {
+  const unsubscribe = onAuthStateChanged(auth, (u) => {
+    console.log("USER:", u); // 👈 añade esto
+    setUser(u);
+  });
 
-    return unsubscribe;
-  }, []);
+  return unsubscribe;
+}, []);
 
   const login = async () => {
     try {
-      await signInWithPopup(auth, provider);
+      await setPersistence(auth, browserLocalPersistence);
+await signInWithPopup(auth, provider);
     } catch (e) {
       console.log("Error login", e);
     }
