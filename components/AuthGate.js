@@ -23,14 +23,21 @@ export default function AuthGate({ children }) {
 useEffect(() => {
 
   getRedirectResult(auth)
-    .then((result) => {
-      if (result?.user) {
-        console.log("REDIRECT USER:", result.user);
-      }
-    })
-    .catch((error) => {
-      console.log("Redirect error:", error);
-    });
+  .then((result) => {
+    if (result?.user) {
+      console.log("REDIRECT USER:", result.user);
+      setUser(result.user);        // 👈 CLAVE
+      setLoading(false);           // 👈 CLAVE
+    }
+  })
+  .catch((error) => {
+    console.log("Redirect error:", error);
+    setLoading(false);             // 👈 evita bloqueo
+  });
+
+
+
+   
 
   const unsubscribe = onAuthStateChanged(auth, (u) => {
   console.log("USER:", u);
