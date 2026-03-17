@@ -523,7 +523,7 @@ if (Platform.OS === "web") {
 };
 
 return (
-  <children>
+  <AuthGate>
   <View style={styles.container}>
 
     <TouchableOpacity
@@ -683,8 +683,9 @@ return (
 />
       <StatusBar style="auto" />
     </View>
-    </children>
+    </AuthGate>
   );
+  
 }
 
 const styles = StyleSheet.create({

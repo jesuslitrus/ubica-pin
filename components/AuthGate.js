@@ -45,10 +45,9 @@ export default function AuthGate({ children }) {
   }
 
   return (
-    <>
-      {children}
-      {/* botón opcional de logout */}
-      <Button title="Cerrar sesión" onPress={logout} />
-    </>
-  );
+  <>
+    {children}
+    <Button title="Cerrar sesión" onPress={logout} />
+  </>
+);
 }
