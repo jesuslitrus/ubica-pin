@@ -33,27 +33,42 @@ export default function App() {
   const [showMap, setShowMap] = useState(false);
   const [localCount, setLocalCount] = useState(0);
   const [showMenu, setShowMenu] = useState(false);
+  //,,,,,,,,,,,,,,,,,,,
 
 useEffect(() => {
+    // Solo ejecutamos si estamos en modo firebase y el usuario está logueado
+    const auth = getAuth();
+    
+    if (appMode !== "firebase") {
+      loadLocations(); // Carga local si no es firebase
+      return;
+    }
 
-  if (appMode !== "firebase") return;
+    // Escuchamos cambios en la autenticación para activar la lectura de datos
+    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        console.log("Cargando datos para:", user.email);
+        const q = collection(db, "locations");
+        const unsubscribeSnapshot = onSnapshot(q, (snapshot) => {
+          const list = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          }));
+          setLocations(list);
+        }, (error) => {
+          console.error("Error en Snapshot (Permisos):", error);
+        });
 
-  const unsubscribe = onSnapshot(collection(db, "locations"), (snapshot) => {
+        return () => unsubscribeSnapshot();
+      } else {
+        setLocations([]); // Limpiar si no hay usuario
+      }
+    });
 
-    const data = snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
+    return () => unsubscribeAuth();
+  }, [appMode]);
 
-    setLocations(data);
-
-  });
-
-  return unsubscribe;
-
-}, [appMode]); 
-
-
+//,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 const saveLocationLocal = async (location) => {
 
   const stored = await AsyncStorage.getItem(LOCAL_STORAGE_KEY);
@@ -164,21 +179,22 @@ const addLocation = async () => {
       coords = location.coords;
     }
 
-    if (appMode === "firebase") {
+   if (appMode === "firebase") {
       try {
-        // Aseguramos que latitude y longitude sean números antes de enviar a Firebase
+        // Aseguramos conversión a número para cumplir las reglas de Firebase
         await addDoc(collection(db, "locations"), {
           description: description,
-          latitude: Number(coords.latitude),  // Forzamos número
-          longitude: Number(coords.longitude), // Forzamos número
+          latitude: Number(coords.latitude),
+          longitude: Number(coords.longitude),
           date: new Date().toISOString(),
         });
 
         setDescription("");
         setEditingId(null);
+        Alert.alert("Éxito", "Ubicación guardada en la nube.");
       } catch (e) {
-        console.error("Error al añadir a Firebase:", e);
-        Alert.alert("Error", "No tienes permisos para guardar o los datos son incorrectos.");
+        console.error("Error al añadir:", e);
+        Alert.alert("Error de permisos", "Tu correo no está en la lista de autorizados o los datos son inválidos.");
       }
     } else {
       // Lógica para modo local (AsyncStorage)
