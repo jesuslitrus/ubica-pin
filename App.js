@@ -10,6 +10,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { db } from "./firebase";
 import { collection, addDoc, deleteDoc, updateDoc, doc, onSnapshot } from "firebase/firestore";
 import SettingsMenu from "./components/SettingsMenu";
+import AuthGate from "./components/AuthGate";
 
 const LOCAL_STORAGE_KEY = "ubicapin_locations";
 
@@ -32,27 +33,79 @@ export default function App() {
   const [showMap, setShowMap] = useState(false);
   const [localCount, setLocalCount] = useState(0);
   const [showMenu, setShowMenu] = useState(false);
+  //,,,,,,,,,,,,,,,,,,,
 
 useEffect(() => {
+    // Solo ejecutamos si estamos en modo firebase y el usuario está logueado
+    
+    
+    if (appMode !== "firebase") {
+      loadLocations(); // Carga local si no es firebase
 
-  if (appMode !== "firebase") return;
+      // --- INICIO DEL BLOQUE REQUERIDO ---------------------------------------------
+  const renderLocation = ({ item }) => (
+    <View style={styles.locationItem}>
+      <Text style={styles.locationDescription}>{item.description}</Text>
+      <Text style={styles.locationDate}>{item.date}</Text>
+      <View style={styles.buttonRow}>
+        <TouchableOpacity 
+          style={styles.smallButton} 
+          onPress={() => openMaps(item.latitude, item.longitude)}
+        >
+          <Text style={styles.buttonText}>Mapa</Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          style={styles.smallEditButton} 
+          onPress={() => {
+            setEditingId(item.id);
+            setDescription(item.description);
+          }}
+        >
+          <Text style={styles.buttonText}>Editar</Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          style={styles.smallDeleteButton} 
+          onPress={() => deleteLocation(item.id)}
+        >
+          <Text style={styles.buttonText}>Borrar</Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          style={styles.smallShareButton} 
+          onPress={() => shareLocation(item)}
+        >
+          <Text style={styles.buttonText}>Compartir</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+  // --- FIN DEL BLOQUE REQUERIDO ----------------------------------------------
+      return;
+    }
 
-  const unsubscribe = onSnapshot(collection(db, "locations"), (snapshot) => {
+if (appMode === "firebase") {
+  const q = collection(db, "locations");
 
-    const data = snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
+  const unsubscribeSnapshot = onSnapshot(
+    q,
+    (snapshot) => {
+      const list = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setLocations(list);
+    },
+    (error) => {
+      console.error("Error en Snapshot:", error);
+    }
+  );
 
-    setLocations(data);
+  return () => unsubscribeSnapshot();
+}
 
-  });
+    
+  }, [appMode]);
 
-  return unsubscribe;
-
-}, [appMode]); 
-
-
+//,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 const saveLocationLocal = async (location) => {
 
   const stored = await AsyncStorage.getItem(LOCAL_STORAGE_KEY);
@@ -110,10 +163,7 @@ const syncLocalToFirebase = async () => {
 
     const { id, ...data } = loc;
 
-    await addDoc(collection(db, "locations"), {
-  ...data,
-  secret: "Torrente"
-});
+    await addDoc(collection(db, "locations"), data);
 
   }
 
@@ -138,124 +188,68 @@ const shareLocation = async (location) => {
 };
 
 
-
+//------------------------------------------------------------------
 const addLocation = async () => {
+    let coords;
 
-  let coords;
-
-  if (Platform.OS === "web") {
-
- coords = await new Promise((resolve) => {
-
-  if (!navigator.geolocation) {
-    alert("Geolocalización no disponible");
-    return;
-  }
-
-
-  
-
-  navigator.geolocation.getCurrentPosition(
-    (position) => resolve(position.coords),
-    (error) => {
-      alert("No se pudo obtener la ubicación");
-      resolve({
-        latitude: 40.4168,
-        longitude: -3.7038
+    if (Platform.OS === "web") {
+      coords = await new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(
+          (position) => resolve(position.coords),
+          (error) => reject(error),
+          {
+            enableHighAccuracy: true, // Despierta el GPS real en iOS
+            timeout: 15000,           // Tiempo para capturar señal
+            maximumAge: 0             // PROHÍBE usar la ubicación fija 40.25...
+          }
+        );
       });
-    },
-    {
-      enableHighAccuracy: true,
-      timeout: 10000,
-      maximumAge: 0
-    }
-  );
-
-});
-
-  } else {
-
-    const { status } = await Location.requestForegroundPermissionsAsync();
-
-    if (status !== "granted") {
-      alert("Permiso de ubicación denegado");
-      return;
+    } else {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert("Permiso denegado", "Se necesita permiso para acceder a la ubicación.");
+        return;
+      }
+      const location = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.High
+      });
+      coords = location.coords;
     }
 
-    const location = await Location.getCurrentPositionAsync({
-      accuracy: Location.Accuracy.High
-    });
+   if (appMode === "firebase") {
+      try {
+        // Aseguramos conversión a número para cumplir las reglas de Firebase
+        await addDoc(collection(db, "locations"), {
+          description: description,
+          latitude: Number(coords.latitude),
+          longitude: Number(coords.longitude),
+          date: new Date().toISOString(),
+        });
 
-    coords = location.coords;
+        setDescription("");
+        setEditingId(null);
+        Alert.alert("Éxito", "Ubicación guardada en la nube.");
+      } catch (e) {
+        console.error("Error al añadir:", e);
+        Alert.alert("Error de permisos", "Tu correo no está en la lista de autorizados o los datos son inválidos.");
+      }
+    } else {
+      // Lógica para modo local (AsyncStorage)
+      const newLocation = {
+        id: Date.now().toString(),
+        description,
+        latitude: coords.latitude,
+        longitude: coords.longitude,
+        date: new Date().toLocaleString(),
+      };
+      const updated = [newLocation, ...locations];
+      setLocations(updated);
+      await AsyncStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updated));
+      setDescription("");
+    }
+  };
 
-  }
-
-  const newLocation = {
-  description: description || "Ubicación",
-  latitude: coords.latitude,
-  longitude: coords.longitude,
-  date: new Date().toLocaleDateString(),
-  secret: "Torremte"
-};
-
-  let updatedLocations;
-  //
-if (editingId) {
-
-  if (appMode === "firebase") {
-
-    const ref = doc(db, "locations", editingId);
-
-    await updateDoc(ref, {
-      description: description
-    });
-
-  } else {
-
-    const stored = await AsyncStorage.getItem(LOCAL_STORAGE_KEY);
-    const local = stored ? JSON.parse(stored) : [];
-
-    const updated = local.map(loc =>
-      loc.id === editingId
-        ? { ...loc, description: description }
-        : loc
-    );
-
-    await AsyncStorage.setItem(
-      LOCAL_STORAGE_KEY,
-      JSON.stringify(updated)
-    );
-
-    setLocations(updated);
-
-  }
-
-  setEditingId(null);
-  setDescription("");
-
-} else {
-
-  if (appMode === "firebase") {
-
-    await addDoc(collection(db, "locations"), newLocation);
-
-  } else {
-
-    await saveLocationLocal(newLocation);
-
-    setLocalCount(prev => prev + 1);
-
-    const updated = [...locations, { id: Date.now().toString(), ...newLocation }];
-    setLocations(updated);
-
-  }
-setDescription("");
-setEditingId(null);
-
-}
-};
-
-
+//--------------------------------------------------
   
 
 
@@ -524,170 +518,52 @@ if (Platform.OS === "web") {
   }
 
 };
-
+//---------------------------------------------------------------------**
 return (
-  <View style={styles.container}>
+    <AuthGate>
+      <View style={styles.container}>
+        <View style={styles.topButtonRow}>
+          <Text style={styles.title}>Ubica-Pin</Text>
+          <TouchableOpacity onPress={() => setShowMenu(true)} style={styles.menuButton}>
+            <Text style={{ fontSize: 24 }}>⚙️</Text>
+          </TouchableOpacity>
+        </View>
 
-    <TouchableOpacity
-      style={styles.settingsButton}
-      onPress={() => setShowMenu(!showMenu)}
-    >
-      <Text style={{fontSize:22}}>⚙️</Text>
-    </TouchableOpacity>
+        <TextInput
+          style={styles.input}
+          placeholder="Descripción del lugar..."
+          value={description}
+          onChangeText={setDescription}
+        />
 
-    <View style={styles.headerRow}>
+        <TouchableOpacity style={styles.addButton} onPress={addLocation}>
+          <Text style={styles.addButtonText}>
+            {editingId ? "Actualizar Pin" : "📍 Guardar Ubicación Actual"}
+          </Text>
+        </TouchableOpacity>
 
-      <Text style={styles.title}>📍 Ubica-Pin</Text>
+        <FlatList
+          data={locations}
+          keyExtractor={(item) => item.id}
+          renderItem={renderLocation}
+        />
 
-      <TouchableOpacity
-        style={styles.modeBadge}
-        onPress={toggleMode}
-      >
-    
-    <Text style={styles.modeText}>
-  {appMode === "firebase"
-    ? "☁ Sync"
-    : `💾 Local${localCount > 0 ? ` (${localCount})` : ""}`}
-</Text>
-  </TouchableOpacity>
+        <SettingsMenu
+          visible={showMenu}
+          onClose={() => setShowMenu(false)}
+          appMode={appMode}
+          setAppMode={setAppMode}
+          localCount={locations.length}
+          onImport={handleImport}
+          onExport={handleExport}
+        />
 
-</View>
-
-
-      <TextInput
-        style={styles.input}
-        placeholder="Descripción del lugar..."
-        value={description}
-        onChangeText={setDescription}
-      />
-
-
-<View style={styles.topButtonRow}>
-
-
-  
-
-  <TouchableOpacity
-    style={[
-      styles.addButton,
-      editingId && { backgroundColor: "#ffc107" }
-    ]}
-    onPress={addLocation}
-  >
-    <Text style={styles.addButtonText}>
-      {editingId ? "Guardar cambios" : "+ Nueva ubicación"}
-    </Text>
-  </TouchableOpacity>
-
-  <TouchableOpacity
-    style={styles.mapButton}
-    onPress={() => setShowMap(!showMap)}
-  >
-    <Text style={styles.buttonText}>
-      {showMap ? "Ocultar mapa" : "Ver mapa"}
-    </Text>
-  </TouchableOpacity>
-
-</View>
-
-
-
-{showMap && MapView && (
-  <MapView
-    style={styles.map}
-    initialRegion={{
-      latitude: locations.length ? locations[0].latitude : 40.4168,
-      longitude: locations.length ? locations[0].longitude : -3.7038,
-      latitudeDelta: 0.01,
-      longitudeDelta: 0.01
-    }}
-  >
-    {locations.map((loc) => (
-      <Marker
-        key={loc.id}
-        coordinate={{
-          latitude: loc.latitude,
-          longitude: loc.longitude
-        }}
-        title={loc.description}
-        description={loc.date}
-      />
-    ))}
-  </MapView>
-)}
-
-
-      <FlatList
-        data={locations}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.card}>
-            <Text style={styles.description}>{item.description}</Text>
-           
-          <Text style={styles.date}>📅 {item.date}</Text>
-
-<View style={styles.buttonRow}>
-
-  <TouchableOpacity
-    style={styles.smallButton}
-    onPress={() => openMaps(item.latitude, item.longitude)}
-  >
-    <Text style={styles.buttonText}> Maps</Text>
-  </TouchableOpacity>
-
-  <TouchableOpacity
-    style={styles.smallEditButton}
-    onPress={() => editLocation(item)}
-  >
-    <Text style={styles.buttonText}> Editar</Text>
-  </TouchableOpacity>
-
-  <TouchableOpacity
-  style={styles.smallShareButton}
-  onPress={() => shareLocation(item)}
->
-  <Text style={styles.buttonText}> Enviar</Text>
-</TouchableOpacity>
-
-  <TouchableOpacity
-    style={styles.smallDeleteButton}
-    onPress={() => {
-      if (Platform.OS === "web") {
-        if (window.confirm("¿Seguro que quieres borrar esta ubicación?")) {
-          deleteLocation(item.id);
-        }
-      } else {
-        Alert.alert(
-          "Eliminar ubicación",
-          "¿Seguro que quieres borrar esta ubicación?",
-          [
-            { text: "Cancelar", style: "cancel" },
-            { text: "Eliminar", onPress: () => deleteLocation(item.id) }
-          ]
-        );
-      }
-    }}
-  >
-    <Text style={styles.buttonText}> Borrar</Text>
-  </TouchableOpacity>
-
-</View>
-
-          </View>
-        )}
-      />
-
-<SettingsMenu
-  visible={showMenu}
-  onClose={() => setShowMenu(false)}
-  onExport={exportLocations}
-  onImport={importLocations}
-/>
-      <StatusBar style="auto" />
-    </View>
+        <StatusBar style="auto" />
+      </View>
+    </AuthGate>
   );
 }
-
+//-------------------------------------------------------------------
 const styles = StyleSheet.create({
 
   container: {
