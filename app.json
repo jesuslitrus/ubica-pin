@@ -6,36 +6,37 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-
     "assetBundlePatterns": ["**/*"],
-
-    "ios": {
-      "supportsTablet": true
-    },
-
+    "ios": { "supportsTablet": true },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       }
     },
-
     "web": {
-      "bundler": "metro",
-      "output": "single",
-      "publicPath": "/ubica-pin/",
-      "favicon": "./assets/favicon.png",
-      "appleTouchIcon": "./assets/logo_512.png",
-      "name": "Ubica-Pin",
-      "shortName": "UbicaPin",
-      "backgroundColor": "#ffffff",
-      "themeColor": "#000000"
-    }
+  "bundler": "metro",
+  "output": "single",
+  "publicPath": "/ubica-pin/",
+  "favicon": "./assets/favicon.png",
+  "appleTouchIcon": "./assets/logo_512.png",
+  "name": "Ubica-Pin",
+  "shortName": "UbicaPin",
+  "backgroundColor": "#ffffff",
+  "themeColor": "#000000",
+  "display": "standalone",
+
+  "meta": {
+    "apple-mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-status-bar-style": "black",
+    "apple-mobile-web-app-title": "Ubica-Pin"
   }
 }
+  }
+}
+

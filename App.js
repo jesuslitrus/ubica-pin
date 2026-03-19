@@ -149,9 +149,6 @@ const addLocation = async () => {
     return;
   }
 
-
-  
-
   navigator.geolocation.getCurrentPosition(
     (position) => resolve(position.coords),
     (error) => {
@@ -463,18 +460,7 @@ const importLocations = async () => {
 
     const fileUri = result.assets[0].uri;
 
-    let content;
-
-if (Platform.OS === "web") {
-
-  const response = await fetch(fileUri);
-  content = await response.text();
-
-} else {
-
-  content = await FileSystem.readAsStringAsync(fileUri);
-
-}
+    const content = await FileSystem.readAsStringAsync(fileUri);
 
     const importedLocations = JSON.parse(content);
 
