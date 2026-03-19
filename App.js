@@ -110,7 +110,10 @@ const syncLocalToFirebase = async () => {
 
     const { id, ...data } = loc;
 
-    await addDoc(collection(db, "locations"), data);
+    await addDoc(collection(db, "locations"), {
+  ...data,
+  secret: "Torrente"
+});
 
   }
 
@@ -191,7 +194,8 @@ const addLocation = async () => {
   description: description || "Ubicación",
   latitude: coords.latitude,
   longitude: coords.longitude,
-  date: new Date().toLocaleDateString()
+  date: new Date().toLocaleDateString(),
+  secret: "Torremte"
 };
 
   let updatedLocations;
