@@ -37,12 +37,12 @@ export default function App() {
 
 useEffect(() => {
     // Solo ejecutamos si estamos en modo firebase y el usuario está logueado
-    const auth = getAuth();
+    
     
     if (appMode !== "firebase") {
       loadLocations(); // Carga local si no es firebase
 
-      // --- INICIO DEL BLOQUE REQUERIDO ---
+      // --- INICIO DEL BLOQUE REQUERIDO ---------------------------------------------
   const renderLocation = ({ item }) => (
     <View style={styles.locationItem}>
       <Text style={styles.locationDescription}>{item.description}</Text>
@@ -78,30 +78,29 @@ useEffect(() => {
       </View>
     </View>
   );
-  // --- FIN DEL BLOQUE REQUERIDO ---
+  // --- FIN DEL BLOQUE REQUERIDO ----------------------------------------------
       return;
     }
 
-    // Escuchamos cambios en la autenticación para activar la lectura de datos
-    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        console.log("Cargando datos para:", user.email);
-        const q = collection(db, "locations");
-        const unsubscribeSnapshot = onSnapshot(q, (snapshot) => {
-          const list = snapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-          }));
-          setLocations(list);
-        }, (error) => {
-          console.error("Error en Snapshot (Permisos):", error);
-        });
+if (appMode === "firebase") {
+  const q = collection(db, "locations");
 
-        return () => unsubscribeSnapshot();
-      } else {
-        setLocations([]); // Limpiar si no hay usuario
-      }
-    });
+  const unsubscribeSnapshot = onSnapshot(
+    q,
+    (snapshot) => {
+      const list = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setLocations(list);
+    },
+    (error) => {
+      console.error("Error en Snapshot:", error);
+    }
+  );
+
+  return () => unsubscribeSnapshot();
+}
 
     return () => unsubscribeAuth();
   }, [appMode]);
@@ -519,7 +518,7 @@ if (Platform.OS === "web") {
   }
 
 };
-//---------------------------------------------------------------------
+//---------------------------------------------------------------------**
 return (
     <AuthGate>
       <View style={styles.container}>
